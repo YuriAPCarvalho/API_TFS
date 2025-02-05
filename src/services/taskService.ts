@@ -13,7 +13,7 @@ interface TaskParams {
   complexity: string
 }
 
-export const criarTask = async ({
+export const createTask = async ({
   idPbi,
   title,
   areaPath,

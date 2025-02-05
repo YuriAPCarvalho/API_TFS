@@ -1,6 +1,6 @@
-import { criarTask } from './src/services/taskService'
+import { createTask } from './src/services/taskService'
 
-criarTask({
+createTask({
   idPbi: 1082041,
   title: 'Teste',
   areaPath: 'CSIS-G08\\Área de Negócios',
