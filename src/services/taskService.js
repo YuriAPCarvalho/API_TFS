@@ -1,7 +1,13 @@
 import { post } from './httpClient.js'
 import { TFS_URL, COLLECTION, PROJECT } from '../config.js'
+import * as XLSX from "xlsx";
 
 export const createTask = async ({
+  tipoTarefa,
+  datas,
+  time,
+  sprint,
+  integrante,
   idPbi,
   title,
   areaPath,
@@ -12,6 +18,26 @@ export const createTask = async ({
   activity,
   complexity,
 }) => {
+  const reader = new FileReader();
+
+  reader.onload = (e) => {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    // Pegar a primeira aba (sheet) do arquivo
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    // Converter os dados da planilha para JSON
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+    resolve(jsonData);
+  };
+
+  reader.onerror = (error) => reject(error);
+
+  reader.readAsArrayBuffer(file);
+
   const url = `${TFS_URL}/${COLLECTION}/${PROJECT}/_apis/wit/workitems/$task?api-version=2.0`
 
   const body = JSON.stringify([
