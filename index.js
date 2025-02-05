@@ -1,4 +1,4 @@
-import { createTask } from './src/services/taskService'
+import { createTask } from './src/services/taskService.js'
 
 createTask({
   idPbi: 1082041,

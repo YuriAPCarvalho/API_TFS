@@ -1,17 +1,5 @@
-import { post } from './httpClient'
-import { TFS_URL, COLLECTION, PROJECT } from '../config'
-
-interface TaskParams {
-  idPbi: number
-  title: string
-  areaPath: string
-  iterationPath: string
-  assignedTo: string
-  contract: string
-  activityId: number
-  activity: string
-  complexity: string
-}
+import { post } from './httpClient.js'
+import { TFS_URL, COLLECTION, PROJECT } from '../config.js'
 
 export const createTask = async ({
   idPbi,
@@ -23,7 +11,7 @@ export const createTask = async ({
   activityId,
   activity,
   complexity,
-}: TaskParams) => {
+}) => {
   const url = `${TFS_URL}/${COLLECTION}/${PROJECT}/_apis/wit/workitems/$task?api-version=2.0`
 
   const body = JSON.stringify([
