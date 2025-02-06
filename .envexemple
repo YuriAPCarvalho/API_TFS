@@ -1,0 +1,6 @@
+TFS_URL =http://tfs.sgi.ms.gov.br/tfs
+COLLECTION =Global
+PROJECT =CSIS-G08
+USERNAME=
+PASSWORD=""
+DOMAIN=FAZENDA
