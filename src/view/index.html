@@ -1,51 +1,59 @@
 <!doctype html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Formulário de Tarefa</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="container">
-      <h1>Criar Tarefa no TFS</h1>
-      <form id="taskForm">
-        <!-- Select para tipo de tarefa -->
-        <label for="taskType">Tipo de Tarefa:</label>
-        <select id="taskType" name="taskType">
-          <option value="daily">Daily</option>
-          <option value="monitoramento">Monitoramento</option>
-          <option value="personalizado">Personalizado</option>
-        </select>
 
-        <!-- Campo para CSV se personalizado for selecionado -->
-        <div id="csvInput" class="hidden">
-          <label for="csvFile">Selecione um arquivo CSV:</label>
-          <input type="file" id="csvFile" name="csvFile" accept=".csv" />
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulário de Tarefa</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-        <!-- Calendário -->
-        <label for="calendar">Selecione a data:</label>
-        <input type="date" id="calendar" name="calendar" />
+<body>
+  <div class="container">
+    <h1>Criar Tarefa no TFS</h1>
+    <form id="taskForm">
+      <!-- Select para tipo de tarefa -->
+      <label for="taskType">Tipo de Tarefa:</label>
+      <select id="taskType" name="taskType">
+        <option value="daily">Daily</option>
+        <option value="monitoramento">Monitoramento</option>
+        <option value="personalizado">Personalizado</option>
+      </select>
 
-        <!-- Select para time -->
-        <label for="team">Selecione o time:</label>
-        <select id="team" name="team">
-          <option value="g08">G08</option>
-          <option value="g09">G09</option>
-        </select>
+      <!-- Campo para Excel se "Personalizado" for selecionado -->
+      <div id="excelInput" class="hidden">
+        <label for="excelFile">Selecione um arquivo Excel:</label>
+        <input type="file" id="excelFile" name="excelFile" accept=".xlsx, .xls" />
+      </div>
+      <!-- Campo para CSV se personalizado for selecionado -->
+      <div id="csvInput" class="hidden">
+        <label for="csvFile">Selecione um arquivo CSV:</label>
+        <input type="file" id="csvFile" name="csvFile" accept=".csv" />
+      </div>
 
-        <!-- Select para integrantes do time -->
-        <label for="members">Selecione o integrante:</label>
-        <select id="members" name="members">
-          <!-- As opções de membros serão inseridas dinamicamente -->
-        </select>
+      <!-- Calendário -->
+      <label for="calendar">Selecione a data:</label>
+      <input type="date" id="calendar" name="calendar" />
 
-        <!-- Botão de envio -->
-        <button type="submit">Criar Tarefa</button>
-      </form>
-    </div>
+      <!-- Select para time -->
+      <label for="team">Selecione o time:</label>
+      <select id="team" name="team">
+        <option value="g08">G08</option>
+        <option value="g09">G09</option>
+      </select>
 
-    <script src="script.js"></script>
-  </body>
+      <!-- Select para integrantes do time -->
+      <label for="members">Selecione o integrante:</label>
+      <select id="members" name="members">
+        <!-- As opções de membros serão inseridas dinamicamente -->
+      </select>
+
+      <!-- Botão de envio -->
+      <button type="submit">Criar Tarefa</button>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
 </html>
