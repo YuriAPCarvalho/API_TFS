@@ -13,6 +13,8 @@ export default {
         foreground: "var(--foreground)",
         primary: "#004F9F",  // Azul semelhante ao do Bootstrap
         secondary: "#2085eb", // Cinza para elementos secundários
+        verde: "#4CAF4F",  // Azul semelhante ao do Bootstrap
+        verde500: "#39853b",  // Azul semelhante ao do Bootstrap
       },
     },
   },
