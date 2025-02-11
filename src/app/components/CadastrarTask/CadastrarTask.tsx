@@ -130,7 +130,7 @@ export default function CadastrarTask() {
             {
               op: "add",
               path: "/relations/-",
-              value: { rel: 'System.LinkTypes.Hierarchy-Reverse', url: `${tfsURL}/${collection}/_apis/wit/workitems/1087414` },
+              value: { rel: 'System.LinkTypes.Hierarchy-Reverse', url: `http://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/1087414` },
             },
             {
               op: "add",
