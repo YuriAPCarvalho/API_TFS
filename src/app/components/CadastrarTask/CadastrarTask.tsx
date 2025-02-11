@@ -72,7 +72,6 @@ export default function CadastrarTask() {
 
   const tipoTarefas = [
     { value: "daily", label: "Daily" },
-    { value: "monitoramento", label: "Monitoramento" },
     { value: "retro", label: "Retro" },
     { value: "review", label: "Review" },
     { value: "planning", label: "Planejamento" },
@@ -85,16 +84,30 @@ export default function CadastrarTask() {
     { value: "Alan Arguelho da Silva", label: "Alan Arguelho da Silva" },
     { value: "Bruno Xavier Rodrigues", label: "Bruno Xavier Rodrigues" },
     { value: "Eduardo Silva Arcanjo", label: "Eduardo Silva Arcanjo" },
-    { value: "Fabricio Almeida de Oliveira", label: "Fabricio Almeida de Oliveira" },
-    { value: "Fillipe Kenzo Yamasaki Sawamura", label: "Fillipe Kenzo Yamasaki Sawamura" },
-    { value: "Gabriel Medeiros Gomes da Silva", label: "Gabriel Medeiros Gomes da Silva" },
-    { value: "Higor Henrique Campos de Assis", label: "Higor Henrique Campos de Assis" },
+    {
+      value: "Fabricio Almeida de Oliveira",
+      label: "Fabricio Almeida de Oliveira",
+    },
+    {
+      value: "Fillipe Kenzo Yamasaki Sawamura",
+      label: "Fillipe Kenzo Yamasaki Sawamura",
+    },
+    {
+      value: "Gabriel Medeiros Gomes da Silva",
+      label: "Gabriel Medeiros Gomes da Silva",
+    },
+    {
+      value: "Higor Henrique Campos de Assis",
+      label: "Higor Henrique Campos de Assis",
+    },
     { value: "Marcel Ferreira Yassumoto", label: "Marcel Ferreira Yassumotoy" },
-    { value: "Yuri Alexandre Pires de Carvalho", label: "Yuri Alexandre Pires de Carvalho" },
+    {
+      value: "Yuri Alexandre Pires de Carvalho",
+      label: "Yuri Alexandre Pires de Carvalho",
+    },
   ];
 
   const handleSubmit = async (values: any) => {
-    console.log(values);
     setFormValues(values);
     setIsModalOpen(true);
     if (values.arquivo != null) {
@@ -102,25 +115,142 @@ export default function CadastrarTask() {
     }
   };
 
-  const handleLoginSuccess = (values: any) => {
+  const handleLoginSuccess = async (values: any) => {
     setLoading(true);
     try {
-      formValues.data.map((d: any) => {
+      // Processa cada data selecionada
+      for (const d of formValues.data) {
+        const date = new Date(d);
+        const formattedDate = format(date, "dd/MM");
+        const fullDate = format(date, "dd/MM/yyyy");
+        const previousDay = format(
+          new Date(date.setDate(date.getDate() - 1)),
+          "dd/MM"
+        );
+
         if (taskExcel != null) {
+          // Processa tasks do Excel
+          const promises = taskExcel.map((t: any) => {
+            let taskData = {
+              ...t,
+              title: `${formattedDate} - ${t.title.split(" - ")[1].replace("{sprint}", formValues.sprint)} - ${t.title.split("- ")[2]}`,
+            };
+            
+            taskData.description = taskData.description
+              .replace("dd/MM/yyyy", fullDate)
+              .replace(/\(dda\/MMa\)/g, `(${previousDay})`)
+              .replace("dd/MM", formattedDate)
+              .replace("{sprint}", formValues.sprint);
+
+            const bodyJson = JSON.stringify([
+              {
+                op: "add",
+                path: "/fields/System.Credentials",
+                value: {
+                  usuario: values.usuario,
+                  senha: values.senha,
+                },
+              },
+              {
+                op: "add",
+                path: "/relations/-",
+                value: {
+                  rel: "System.LinkTypes.Hierarchy-Reverse",
+                  url: `http://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
+                },
+              },
+              {
+                op: "add",
+                path: "/fields/System.Title",
+                value: taskData.title,
+              },
+              {
+                op: "add",
+                path: "/fields/System.Description",
+                value: taskData.description,
+              },
+              {
+                op: "add",
+                path: "/fields/System.State",
+                value: "To Do",
+              },
+              {
+                op: "add",
+                path: "/fields/System.AreaPath",
+                value: `${project}\\Área de Negócios`,
+              },
+              {
+                op: "add",
+                path: "/fields/System.IterationPath",
+                value: `${project}\\Área de Negócios\\${formValues.sprint}`,
+              },
+              {
+                op: "add",
+                path: "/fields/System.AssignedTo",
+                value: formValues.integrante,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.Empresa",
+                value: contrato,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.LancamentoAtividadeID",
+                value: taskData.activityId,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.AtividadeUST",
+                value: taskData.activity,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.ComplexidadeUST",
+                value: taskData.complexity,
+              },
+              {
+                op: "add",
+                path: "/fields/System.CreatedDate",
+                value: d,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.DataExecucao",
+                value: d,
+              },
+              // {
+              //   op: "add",
+              //   path: "/fields/Microsoft.VSTS.Common.ClosedDate",
+              //   value: d,
+              // },
+            ]);
+
+            return fetchClient(`/api/Task`, {
+              method: "POST",
+              body: bodyJson,
+            });
+          });
+
+          // Aguarda todas as requisições do Excel
+          const results = await Promise.all(promises);
+          console.log(results);
+          
+          const success = results.every(resp => resp.success);
+          
+          if (success) {
+            message.success("Todas as tasks foram cadastradas com sucesso!");
+          } else {
+            message.error("Erro ao cadastrar algumas tasks.");
+          }
         } else {
-          const date = new Date(d);
-          const formattedDate = format(date, "dd/MM");
+          // Processa task normal
           let taskData = {
             ...taskTemplates[formValues.tipoTarefa](),
             title: `${formattedDate} - ${taskTemplates[formValues.tipoTarefa]()
               .title.split(" - ")[1]
               .replace("{sprint}", formValues.sprint)}`,
           };
-          const fullDate = format(date, "dd/MM/yyyy");
-          const previousDay = format(
-            new Date(date.setDate(date.getDate() - 1)),
-            "dd/MM"
-          );
 
           taskData.description = taskData.description
             .replace("dd/MM/yyyy", fullDate)
@@ -140,7 +270,10 @@ export default function CadastrarTask() {
             {
               op: "add",
               path: "/relations/-",
-              value: { rel: 'System.LinkTypes.Hierarchy-Reverse', url: `http://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/1087414` },
+              value: {
+                rel: "System.LinkTypes.Hierarchy-Reverse",
+                url: `http://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
+              },
             },
             {
               op: "add",
@@ -155,7 +288,7 @@ export default function CadastrarTask() {
             {
               op: "add",
               path: "/fields/System.State",
-              value: "Done",
+              value: "To Do",
             },
             {
               op: "add",
@@ -165,7 +298,7 @@ export default function CadastrarTask() {
             {
               op: "add",
               path: "/fields/System.IterationPath",
-              value: `${project}\\Área de Negócios\${formValues.sprint}`,
+              value: `${project}\\Área de Negócios\\${formValues.sprint}`,
             },
             {
               op: "add",
@@ -200,36 +333,28 @@ export default function CadastrarTask() {
             {
               op: "add",
               path: "/fields/Custom.SGI.DataExecucao",
-              value:  d,
+              value: d,
             },
-            {
-              op: "add",
-              path: "/fields/Microsoft.VSTS.Common.ClosedDate",
-              value:  d,
-            },
+            // {
+            //   op: "add",
+            //   path: "/fields/Microsoft.VSTS.Common.ClosedDate",
+            //   value: d,
+            // },
           ]);
-
-          fetchClient(`/api/Task`, {
+          
+          // Envia task normal
+          const response = await fetchClient(`/api/Task`, {
             method: "POST",
             body: bodyJson,
-          })
-            .then((resp) => {
-              if (resp.success) {
-                message.success("Task cadastrada com sucesso!");
-                form.resetFields();
-                setSelectedDates([]);
-              } else {
-                message.error("Erro ao cadastrar a task.");
-              }
-            })
-            .catch(() => {
-              message.error("Erro ao cadastrar a task.");
-            })
-            .finally(() => {
-              setLoading(false);
-            });
+          });
+
+          if (response.success) {
+            message.success("Task cadastrada com sucesso!");
+          } else {
+            message.error("Erro ao cadastrar a task.");
+          }
         }
-      });
+      }
     } catch (error) {
       message.error("Erro ao cadastrar.");
     } finally {
@@ -239,15 +364,10 @@ export default function CadastrarTask() {
   };
 
   const handleFileUpload = async (file: File) => {
-    console.log(file);
-
-    const additionalParams = {
-      /* seus parâmetros adicionais aqui */
-    };
+    const additionalParams = {};
     try {
       const message = await processExcelFile(file, additionalParams);
       setTaskExcel(message);
-      console.log(message);
     } catch (error) {
       console.error("Erro ao processar o arquivo Excel:", error);
     }
@@ -276,6 +396,13 @@ export default function CadastrarTask() {
           rules={[{ required: true, message: "Campo obrigatório" }]}
         >
           <SelectComponent name="Sprint" options={sprints} />
+        </Form.Item>
+
+        <Form.Item
+          name="pbi"
+          rules={[{ required: true, message: "Campo obrigatório" }]}
+        >
+          <InputComponent name="PBI" type="number"  nameForm={"pbi"} form={form} placeholder="Informe a PBI"/>
         </Form.Item>
 
         {tipoTarefa === "personalizado" && (

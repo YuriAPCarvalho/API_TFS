@@ -17,7 +17,6 @@ export default function ModalLoginGSI(props: ModalLoginGSIProps) {
   useEffect(() => {}, [props.visible]);
 
   const onFinish = async (values: any) => {
-    console.log(values);
     props.onFinish(values);
   };
 
@@ -40,7 +39,6 @@ export default function ModalLoginGSI(props: ModalLoginGSIProps) {
               autoComplete="off"
               onFinish={onFinish}
               onFinishFailed={(errorInfo) => {
-                console.log('Falha na validação:', errorInfo);
                 message.error('Por favor, preencha todos os campos obrigatórios.');
               }}
             >

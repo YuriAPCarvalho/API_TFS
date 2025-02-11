@@ -1,7 +1,6 @@
 import { GetServerSidePropsContext, PreviewData } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import { getAuthHeaders } from '../getAuthHeaders';
-import Router from 'next/router';
 import { message } from 'antd';
 
 export default async function fetchClient(input: RequestInfo | URL, init?: RequestInit, rotaProtegida = true, serverSide: boolean = false,
@@ -12,18 +11,18 @@ export default async function fetchClient(input: RequestInfo | URL, init?: Reque
         let customInit: RequestInit = { ...init, headers: headers, };
 
         let res = await fetch(input, customInit)
+        console.log(res);
 
         if (res.ok) {
             resolve(await res.json())
         }
-
+        
         else if (res.status == 401 || res.status == 403) {
             let body = await res.json()
-            Router.push("/")
             message.error({
                 key: 401,
                 duration: 8,
-                content: body.error?.length > 0 ? body.error[0] : "Sessão expirada"
+                content: body.error?.length > 0 ? body.error[0] : "Falha na Autenticação"
             }
             )
             reject(body)

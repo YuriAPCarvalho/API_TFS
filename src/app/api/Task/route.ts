@@ -25,13 +25,7 @@ export async function POST(request: NextRequest) {
     const client = NtlmClient(credentials);
 
     console.log('Request Body:', JSON.stringify(taskBody, null, 2));
-    console.log('URL:', `${tfsURL}/${collection}/${project}/_apis/wit/workitems/$task?api-version=2.0`);
-    console.log(`${tfsURL}/${collection}/_apis/wit/workitems/1087414?api-version=2.0`);
     
-    // const res = await client.get(
-    //   `http://${tfsURL}/${collection}/_apis/wit/workitems/1087414?api-version=2.0`
-    // )
-
     const response = await client.post(
       `${tfsURL}/${collection}/${project}/_apis/wit/workitems/$task?api-version=2.0`,
       taskBody,
@@ -42,8 +36,6 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    console.log('Response:', response.status, response.data);
-
     if (response.status !== 200) {
       return NextResponse.json(
         { success: false, message: "Erro ao cadastrar task" },
@@ -51,9 +43,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ success: true, data: response.data });
+    return NextResponse.json({ 
+      success: true, 
+      data: response.data,
+      message: "Task criada com sucesso! ID: " + response.data.id
+    });
+
   } catch (error: any) {
     console.error("Erro ao processar requisição:", error.response?.data || error.message);
+    
+    // Verifica se é erro de autenticação
+    if (error.response?.status === 401) {
+      return NextResponse.json(
+        { success: false, message: "Falha na autenticação. Verifique suas credenciais." },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json(
       { success: false, message: error.response?.data?.message || "Erro interno do servidor" },
       { status: error.response?.status || 500 }

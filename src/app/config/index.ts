@@ -10,11 +10,3 @@ export const contrato = process.env.NEXT_PUBLIC_CONTRACT || '056/2021 - 16811 - 
 export const USERNAME = process.env.NEXT_PUBLIC_USERNAME || '';
 export const PASSWORD = process.env.NEXT_PUBLIC_PASSWORD || '';
 export const DOMINIO = process.env.NEXT_PUBLIC_DOMAIN || 'FAZENDA';
-
-console.log('Config:', {
-  tfsURL,
-  collection,
-  project,
-  DOMINIO,
-  contrato
-});

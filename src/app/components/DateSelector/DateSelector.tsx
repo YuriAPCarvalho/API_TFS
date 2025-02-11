@@ -12,7 +12,6 @@ export default function DateSelectorComponent({ name, onChange }: DateSelectorPr
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
 
   const handleChange = (date: Date | null) => {
-    console.log(selectedDates);
     
     if (date) {
       setSelectedDates((prevDates) => {
