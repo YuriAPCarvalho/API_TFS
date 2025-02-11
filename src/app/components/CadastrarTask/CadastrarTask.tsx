@@ -81,7 +81,7 @@ export default function CadastrarTask() {
 
   const times = [{ value: "g08", label: "G08" }];
   const sprints = [{ value: "Sprint 216", label: "Sprint 216" }];
-  const integrantes = [{ value: "Fillipe Kenzo", label: "Fillipe Kenzo" }];
+  const integrantes = [{ value: "Fillipe Kenzo Yamasaki Sawamura", label: "Fillipe Kenzo Yamasaki Sawamura" }];
 
   const handleSubmit = async (values: any) => {
     console.log(values);
@@ -145,12 +145,12 @@ export default function CadastrarTask() {
             {
               op: "add",
               path: "/fields/System.State",
-              value: "Done",
+              value: "To Do",
             },
             {
               op: "add",
               path: "/fields/System.AreaPath",
-              value: `${project}\\${formValues.time}`,
+              value: `${project}\\Área de Negócios`,
             },
             {
               op: "add",
@@ -181,6 +181,16 @@ export default function CadastrarTask() {
               op: "add",
               path: "/fields/Custom.SGI.ComplexidadeUST",
               value: taskData.complexity,
+            },
+            {
+              op: "add",
+              path: "/fields/System.CreatedDate",
+              value: d,
+            },
+            {
+              op: "add",
+              path: "/fields/Custom.SGI.DataExecucao",
+              value:  d,
             },
           ]);
 
