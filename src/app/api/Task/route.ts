@@ -24,8 +24,6 @@ export async function POST(request: NextRequest) {
     
     const client = NtlmClient(credentials);
 
-    console.log('Request Body:', JSON.stringify(taskBody, null, 2));
-    
     const response = await client.post(
       `${tfsURL}/${collection}/${project}/_apis/wit/workitems/$task?api-version=2.0`,
       taskBody,

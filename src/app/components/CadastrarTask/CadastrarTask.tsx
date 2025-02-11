@@ -118,8 +118,11 @@ export default function CadastrarTask() {
   const handleLoginSuccess = async (values: any) => {
     setLoading(true);
     try {
-      // Processa cada data selecionada
-      for (const d of formValues.data) {
+        console.log(formValues.data);
+        // Processa cada data selecionada
+        formValues.data.map(async (d:any) => {
+        console.log(d);
+        
         const date = new Date(d);
         const formattedDate = format(date, "dd/MM");
         const fullDate = format(date, "dd/MM/yyyy");
@@ -133,9 +136,13 @@ export default function CadastrarTask() {
           const promises = taskExcel.map((t: any) => {
             let taskData = {
               ...t,
-              title: `${formattedDate} - ${t.title.split(" - ")[1].replace("{sprint}", formValues.sprint)} - ${t.title.split("- ")[2]}`,
+              title: `${formattedDate} - ${t.title
+                .split(" - ")[1]
+                .replace("{sprint}", formValues.sprint)} - ${
+                t.title.split("- ")[2]
+              }`,
             };
-            
+
             taskData.description = taskData.description
               .replace("dd/MM/yyyy", fullDate)
               .replace(/\(dda\/MMa\)/g, `(${previousDay})`)
@@ -225,7 +232,6 @@ export default function CadastrarTask() {
               //   value: d,
               // },
             ]);
-
             return fetchClient(`/api/Task`, {
               method: "POST",
               body: bodyJson,
@@ -234,10 +240,9 @@ export default function CadastrarTask() {
 
           // Aguarda todas as requisições do Excel
           const results = await Promise.all(promises);
-          console.log(results);
-          
-          const success = results.every(resp => resp.success);
-          
+
+          const success = results.every((resp) => resp.success);
+
           if (success) {
             message.success("Todas as tasks foram cadastradas com sucesso!");
           } else {
@@ -341,7 +346,7 @@ export default function CadastrarTask() {
             //   value: d,
             // },
           ]);
-          
+
           // Envia task normal
           const response = await fetchClient(`/api/Task`, {
             method: "POST",
@@ -354,7 +359,7 @@ export default function CadastrarTask() {
             message.error("Erro ao cadastrar a task.");
           }
         }
-      }
+      })
     } catch (error) {
       message.error("Erro ao cadastrar.");
     } finally {
@@ -402,7 +407,13 @@ export default function CadastrarTask() {
           name="pbi"
           rules={[{ required: true, message: "Campo obrigatório" }]}
         >
-          <InputComponent name="PBI" type="number"  nameForm={"pbi"} form={form} placeholder="Informe a PBI"/>
+          <InputComponent
+            name="PBI"
+            type="number"
+            nameForm={"pbi"}
+            form={form}
+            placeholder="Informe a PBI"
+          />
         </Form.Item>
 
         {tipoTarefa === "personalizado" && (

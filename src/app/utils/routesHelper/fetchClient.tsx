@@ -11,7 +11,6 @@ export default async function fetchClient(input: RequestInfo | URL, init?: Reque
         let customInit: RequestInit = { ...init, headers: headers, };
 
         let res = await fetch(input, customInit)
-        console.log(res);
 
         if (res.ok) {
             resolve(await res.json())
