@@ -6,9 +6,11 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {   
+    console.log(req.body);
+    console.log("teste");
+    
     // const response = await axios.post(
         
     // )        
     // res.status(response.status).json(await response.json())
 }
-

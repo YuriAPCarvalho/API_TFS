@@ -11,6 +11,8 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: "#004F9F",  // Azul semelhante ao do Bootstrap
+        secondary: "#2085eb", // Cinza para elementos secundários
       },
     },
   },
