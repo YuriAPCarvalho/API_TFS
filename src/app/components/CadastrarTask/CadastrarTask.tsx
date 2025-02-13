@@ -118,11 +118,11 @@ export default function CadastrarTask() {
   const handleLoginSuccess = async (values: any) => {
     setLoading(true);
     try {
-        console.log(formValues.data);
-        // Processa cada data selecionada
-        formValues.data.map(async (d:any) => {
+      console.log(formValues.data);
+      // Processa cada data selecionada
+      formValues.data.map(async (d: any) => {
         console.log(d);
-        
+
         const date = new Date(d);
         const formattedDate = format(date, "dd/MM");
         const fullDate = format(date, "dd/MM/yyyy");
@@ -134,13 +134,13 @@ export default function CadastrarTask() {
         if (taskExcel != null) {
           // Processa tasks do Excel
           const promises = taskExcel.map((t: any) => {
+            const part1 =
+              t.title.split(" - ")[1]?.replace("{sprint}", formValues.sprint) ??
+              "";
+            const part2 = t.title.split("- ")[2] ?? "";
             let taskData = {
               ...t,
-              title: `${formattedDate} - ${t.title
-                .split(" - ")[1]
-                .replace("{sprint}", formValues.sprint)} - ${
-                t.title.split("- ")[2]
-              }`,
+              title: `${formattedDate} - ${part1}${part2 ? " - " + part2 : ""}`,
             };
 
             taskData.description = taskData.description
@@ -359,7 +359,7 @@ export default function CadastrarTask() {
             message.error("Erro ao cadastrar a task.");
           }
         }
-      })
+      });
     } catch (error) {
       message.error("Erro ao cadastrar.");
     } finally {
