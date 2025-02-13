@@ -134,13 +134,14 @@ export default function CadastrarTask() {
         if (taskExcel != null) {
           // Processa tasks do Excel
           const promises = taskExcel.map((t: any) => {
-            const part1 =
-              t.title.split(" - ")[1]?.replace("{sprint}", formValues.sprint) ??
-              "";
-            const part2 = t.title.split("- ")[2] ?? "";
+            const part = t.title
+              .replace("dd/MM/yyyy", fullDate)
+              .replace(/\(dda\/MMa\)/g, `(${previousDay})`)
+              .replace("dd/MM", formattedDate)
+              .replace("{sprint}", formValues.sprint);
             let taskData = {
               ...t,
-              title: `${formattedDate} - ${part1}${part2 ? " - " + part2 : ""}`,
+              title: `${formattedDate} - ${part}`,
             };
 
             taskData.description = taskData.description
@@ -253,7 +254,9 @@ export default function CadastrarTask() {
           let taskData = {
             ...taskTemplates[formValues.tipoTarefa](),
             title: `${formattedDate} - ${taskTemplates[formValues.tipoTarefa]()
-              .title.split(" - ")[1]
+              .title.replace("dd/MM/yyyy", fullDate)
+              .replace(/\(dda\/MMa\)/g, `(${previousDay})`)
+              .replace("dd/MM", formattedDate)
               .replace("{sprint}", formValues.sprint)}`,
           };
 
