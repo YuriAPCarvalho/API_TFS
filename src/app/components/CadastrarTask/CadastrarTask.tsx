@@ -79,7 +79,10 @@ export default function CadastrarTask() {
   ];
 
   const times = [{ value: "g08", label: "G08" }];
-  const sprints = [{ value: "Sprint 216", label: "Sprint 216" }];
+  const sprints = [
+    { value: "Sprint 216", label: "Sprint 216" },
+    { value: "Sprint 217", label: "Sprint 217" },
+  ];
   const integrantes = [
     { value: "Alan Arguelho da Silva", label: "Alan Arguelho da Silva" },
     { value: "Bruno Xavier Rodrigues", label: "Bruno Xavier Rodrigues" },
@@ -141,7 +144,7 @@ export default function CadastrarTask() {
               .replace("{sprint}", formValues.sprint);
             let taskData = {
               ...t,
-              title: `${formattedDate} - ${part}`,
+              title: `${part}`,
             };
 
             taskData.description = taskData.description
@@ -253,7 +256,7 @@ export default function CadastrarTask() {
           // Processa task normal
           let taskData = {
             ...taskTemplates[formValues.tipoTarefa](),
-            title: `${formattedDate} - ${taskTemplates[formValues.tipoTarefa]()
+            title: `${taskTemplates[formValues.tipoTarefa]()
               .title.replace("dd/MM/yyyy", fullDate)
               .replace(/\(dda\/MMa\)/g, `(${previousDay})`)
               .replace("dd/MM", formattedDate)
