@@ -82,8 +82,6 @@ export default function CadastrarTask() {
   const sprints = [
     { value: "Sprint 216", label: "Sprint 216" },
     { value: "Sprint 217", label: "Sprint 217" },
-    { value: "Sprint 218", label: "Sprint 218" },
-    { value: "Sprint 219", label: "Sprint 219" },
   ];
   const integrantes = [
     { value: "Alan Arguelho da Silva", label: "Alan Arguelho da Silva" },
@@ -241,9 +239,6 @@ export default function CadastrarTask() {
             return fetchClient(`/api/Task`, {
               method: "POST",
               body: bodyJson,
-            }).then(response => {
-              console.log("Resposta do fetchClient:", response);
-              return response; 
             });
           });
 
@@ -358,12 +353,10 @@ export default function CadastrarTask() {
             // },
           ]);
 
+          // Envia task normal
           const response = await fetchClient(`/api/Task`, {
             method: "POST",
             body: bodyJson,
-          }).then(response => {
-            console.log("Resposta do fetchClient:", response);
-            return response; 
           });
 
           if (response.success) {

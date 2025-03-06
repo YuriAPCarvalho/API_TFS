@@ -41,6 +41,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log(response.data);
+    
     return NextResponse.json({ 
       success: true, 
       data: response.data,
