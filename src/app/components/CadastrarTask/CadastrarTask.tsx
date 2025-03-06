@@ -241,6 +241,9 @@ export default function CadastrarTask() {
             return fetchClient(`/api/Task`, {
               method: "POST",
               body: bodyJson,
+            }).then(response => {
+              console.log("Resposta do fetchClient:", response);
+              return response; 
             });
           });
 
@@ -355,10 +358,12 @@ export default function CadastrarTask() {
             // },
           ]);
 
-          // Envia task normal
           const response = await fetchClient(`/api/Task`, {
             method: "POST",
             body: bodyJson,
+          }).then(response => {
+            console.log("Resposta do fetchClient:", response);
+            return response; 
           });
 
           if (response.success) {
