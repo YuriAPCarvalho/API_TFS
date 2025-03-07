@@ -61,13 +61,12 @@ const taskTemplates: { [key: string]: (data?: any) => TaskTemplate } = {
 
 export default function CadastrarTask() {
   const [form] = Form.useForm();
-  const [selectedDates, setSelectedDates] = useState<Date[]>([]); // Estado para armazenar as datas selecionadas
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formValues, setFormValues] = useState<any>(null);
   const [taskExcel, setTaskExcel] = useState<any>(null);
 
-  // Observa mudanças no campo tipoTarefa
   const tipoTarefa = Form.useWatch("tipoTarefa", form);
 
   const tipoTarefas = [
@@ -82,6 +81,7 @@ export default function CadastrarTask() {
   const sprints = [
     { value: "Sprint 216", label: "Sprint 216" },
     { value: "Sprint 217", label: "Sprint 217" },
+    { value: "Sprint 218", label: "Sprint 218" },
   ];
   const integrantes = [
     { value: "Alan Arguelho da Silva", label: "Alan Arguelho da Silva" },
@@ -167,7 +167,7 @@ export default function CadastrarTask() {
                 path: "/relations/-",
                 value: {
                   rel: "System.LinkTypes.Hierarchy-Reverse",
-                  url: `http://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
+                  url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
                 },
               },
               {
@@ -283,7 +283,7 @@ export default function CadastrarTask() {
               path: "/relations/-",
               value: {
                 rel: "System.LinkTypes.Hierarchy-Reverse",
-                url: `http://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
+                url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
               },
             },
             {
