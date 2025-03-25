@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const { usuario, senha } = body[0].value;
 
     // Remove o objeto de credenciais do body
-    const taskBody = body.filter((item: any) => 
+    const taskBody = body.filter((item: any) =>
       item.path !== "/fields/System.Credentials"
     );
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       password: senha,
       domain: DOMINIO,
     };
-    
+
     const client = NtlmClient(credentials);
 
     const response = await client.post(
@@ -41,17 +41,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(response.data);
-    
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       data: response.data,
       message: "Task criada com sucesso! ID: " + response.data.id
     });
 
   } catch (error: any) {
     console.error("Erro ao processar requisição:", error.response?.data || error.message);
-    
+
     // Verifica se é erro de autenticação
     if (error.response?.status === 401) {
       return NextResponse.json(

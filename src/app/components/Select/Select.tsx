@@ -24,7 +24,7 @@ export default function SelectComponent(props: SelectProps) {
     <div className="flex flex-col gap-1 w-[300px]">
       {" "}
       {/* Definição do width padrão */}
-      <label className="font-semibold text-gray-700">{props.name}</label>
+      <label className="font-semibold text-gray-700">{props?.name}</label>
       <div className="relative">
         <select
           className="w-full p-2 border rounded-lg shadow-[4px_4px_6px_rgba(0,0,0,0.1)] focus:outline-none focus:ring-2 focus:ring-gray-600 appearance-none cursor-pointer"
@@ -34,7 +34,7 @@ export default function SelectComponent(props: SelectProps) {
           <option value="" disabled>
             Selecione
           </option>
-          {props.options.map((option) => (
+          {props?.options?.map((option) => (
             <option
               key={option.value}
               value={option.value}

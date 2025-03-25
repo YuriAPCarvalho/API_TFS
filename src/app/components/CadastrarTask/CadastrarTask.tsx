@@ -11,53 +11,11 @@ import fetchClient from "@/app/utils/routesHelper/fetchClient";
 import { collection, contrato, project, server, tfsURL } from "@/app/config";
 import { processExcelFile } from "@/app/utils/processExcelFile";
 import { format } from "date-fns";
-
-interface TaskTemplate {
-  title: string;
-  description: string;
-  activity: string;
-  complexity: string;
-  activityId: string;
-}
-
-const taskTemplates: { [key: string]: (data?: any) => TaskTemplate } = {
-  daily: () => ({
-    title: "dd/MM - Reunião Diária",
-    description:
-      "Data: dd/MM/yyyy\n\nRelato das tarefas realizadas no dia anterior(dda/MMa)\nRelatos das tarefas planejadas para o dia (dda/MMa)\n\nSem Impedimentos.",
-    activity: "Cerimônias/Reuniões - Reunião Diária",
-    activityId: "4476",
-    complexity: "Única",
-  }),
-  monitoramento: () => ({
-    title: "Monitoramento de Sistemas",
-    description: "Acompanhamento e monitoramento dos sistemas em produção",
-    activity: "Monitoramento",
-    activityId: "4474",
-    complexity: "2",
-  }),
-  retro: () => ({
-    title: "dd/MM - Retrospectiva Sprint {sprint}",
-    description: "dd/MM - Retrospectiva {sprint}",
-    activity: "Cerimônias/Reuniões - Reunião de Retrospectiva de Sprint",
-    activityId: "4474",
-    complexity: "Única",
-  }),
-  review: () => ({
-    title: "dd/MM - Review Sprint {sprint}",
-    description: "dd/MM - Review {sprint}",
-    activity: "Cerimônias/Reuniões - Reunião de Revisão de Sprint",
-    activityId: "4475",
-    complexity: "Única",
-  }),
-  planning: () => ({
-    title: "dd/MM - Planejamento da Sprint {sprint}",
-    description: "dd/MM - Planejamento da {sprint}",
-    activity: "Cerimônias/Reuniões - Reunião de Planejamento de Sprint",
-    activityId: "4473",
-    complexity: "Única",
-  }),
-};
+import { taskTemplates } from "@/app/enums/taskTemplates";
+import { tipoTarefas } from "@/app/enums/tipoTarefas";
+import { integrantes } from "@/app/enums/integrantes";
+import { sprints } from "@/app/enums/sprints";
+import { times } from "@/app/enums/times";
 
 export default function CadastrarTask() {
   const [form] = Form.useForm();
@@ -66,50 +24,9 @@ export default function CadastrarTask() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formValues, setFormValues] = useState<any>(null);
   const [taskExcel, setTaskExcel] = useState<any>(null);
+  const [areaPathPBI, setAreaPathPBI] = useState<any>(null);
 
   const tipoTarefa = Form.useWatch("tipoTarefa", form);
-
-  const tipoTarefas = [
-    { value: "daily", label: "Daily" },
-    { value: "retro", label: "Retro" },
-    { value: "review", label: "Review" },
-    { value: "planning", label: "Planejamento" },
-    { value: "personalizado", label: "Personalizado" },
-  ];
-
-  const times = [{ value: "g08", label: "G08" }];
-  const sprints = [
-    { value: "Sprint 216", label: "Sprint 216" },
-    { value: "Sprint 217", label: "Sprint 217" },
-    { value: "Sprint 218", label: "Sprint 218" },
-    { value: "Sprint 219", label: "Sprint 219" },
-  ];
-  const integrantes = [
-    { value: "Alan Arguelho da Silva", label: "Alan Arguelho da Silva" },
-    { value: "Bruno Xavier Rodrigues", label: "Bruno Xavier Rodrigues" },
-    { value: "Eduardo Silva Arcanjo", label: "Eduardo Silva Arcanjo" },
-    {
-      value: "Fabricio Almeida de Oliveira",
-      label: "Fabricio Almeida de Oliveira",
-    },
-    {
-      value: "Fillipe Kenzo Yamasaki Sawamura",
-      label: "Fillipe Kenzo Yamasaki Sawamura",
-    },
-    {
-      value: "Gabriel Medeiros Gomes da Silva",
-      label: "Gabriel Medeiros Gomes da Silva",
-    },
-    {
-      value: "Higor Henrique Campos de Assis",
-      label: "Higor Henrique Campos de Assis",
-    },
-    { value: "Marcel Ferreira Yassumoto", label: "Marcel Ferreira Yassumotoy" },
-    {
-      value: "Yuri Alexandre Pires de Carvalho",
-      label: "Yuri Alexandre Pires de Carvalho",
-    },
-  ];
 
   const handleSubmit = async (values: any) => {
     setFormValues(values);
@@ -122,11 +39,7 @@ export default function CadastrarTask() {
   const handleLoginSuccess = async (values: any) => {
     setLoading(true);
     try {
-      console.log(formValues.data);
-      // Processa cada data selecionada
       formValues.data.map(async (d: any) => {
-        console.log(d);
-
         const date = new Date(d);
         const formattedDate = format(date, "dd/MM");
         const fullDate = format(date, "dd/MM/yyyy");
@@ -138,21 +51,43 @@ export default function CadastrarTask() {
         if (taskExcel != null) {
           // Processa tasks do Excel
           const promises = taskExcel.map((t: any) => {
+
             const part = t.title
-              .replace("dd/MM/yyyy", fullDate)
-              .replace(/\(dda\/MMa\)/g, `(${previousDay})`)
-              .replace("dd/MM", formattedDate)
+              .replace("{dd/MM/yyyy}", fullDate)
+              .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
+              .replace("{dd/MM}", formattedDate)
+              .replace("{pbi}", t.pbi)
               .replace("{sprint}", formValues.sprint);
+
             let taskData = {
               ...t,
               title: `${part}`,
             };
 
             taskData.description = taskData.description
-              .replace("dd/MM/yyyy", fullDate)
-              .replace(/\(dda\/MMa\)/g, `(${previousDay})`)
-              .replace("dd/MM", formattedDate)
+              .replace("{dd/MM/yyyy}", fullDate)
+              .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
+              .replace("{dd/MM}", formattedDate)
+              .replace("{pbi}", taskData.pbi)
               .replace("{sprint}", formValues.sprint);
+
+            fetchClient(`/api/GetTask?pbi=${taskData.pbi}`, {
+              method: "POST",
+              body: JSON.stringify([
+                {
+                  op: "add",
+                  path: "/fields/System.Credentials",
+                  value: {
+                    usuario: values.usuario,
+                    senha: values.senha,
+                  },
+                },
+              ]),
+            }).then(resp => {
+              const result = resp.data;
+              const areaPath = result.fields["System.AreaPath"];
+              setAreaPathPBI(areaPath)
+            });
 
             const bodyJson = JSON.stringify([
               {
@@ -168,7 +103,7 @@ export default function CadastrarTask() {
                 path: "/relations/-",
                 value: {
                   rel: "System.LinkTypes.Hierarchy-Reverse",
-                  url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
+                  url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${taskData.pbi}`,
                 },
               },
               {
@@ -189,12 +124,12 @@ export default function CadastrarTask() {
               {
                 op: "add",
                 path: "/fields/System.AreaPath",
-                value: `${project}\\Área de Negócios`,
+                value: `${areaPathPBI}`,
               },
               {
                 op: "add",
                 path: "/fields/System.IterationPath",
-                value: `${project}\\Área de Negócios\\${formValues.sprint}`,
+                value: `${project}${taskData.areaPath == 'Área de Negócios' ? '\\Área de Negócios' : ''}\\${formValues.sprint}`,
               },
               {
                 op: "add",
@@ -237,6 +172,7 @@ export default function CadastrarTask() {
               //   value: d,
               // },
             ]);
+
             return fetchClient(`/api/Task`, {
               method: "POST",
               body: bodyJson,
@@ -246,7 +182,7 @@ export default function CadastrarTask() {
           // Aguarda todas as requisições do Excel
           const results = await Promise.all(promises);
 
-          const success = results.every((resp) => resp.success);
+          const success = results.every((resp) => resp?.success);
 
           if (success) {
             message.success("Todas as tasks foram cadastradas com sucesso!");
@@ -254,117 +190,117 @@ export default function CadastrarTask() {
             message.error("Erro ao cadastrar algumas tasks.");
           }
         } else {
-          // Processa task normal
-          let taskData = {
-            ...taskTemplates[formValues.tipoTarefa](),
-            title: `${taskTemplates[formValues.tipoTarefa]()
-              .title.replace("dd/MM/yyyy", fullDate)
-              .replace(/\(dda\/MMa\)/g, `(${previousDay})`)
-              .replace("dd/MM", formattedDate)
-              .replace("{sprint}", formValues.sprint)}`,
-          };
+          const taskTemplateResult = taskTemplates[formValues.tipoTarefa]();
+          const tasks = Array.isArray(taskTemplateResult) ? taskTemplateResult : [taskTemplateResult];
 
-          taskData.description = taskData.description
-            .replace("dd/MM/yyyy", fullDate)
-            .replace(/\(dda\/MMa\)/g, `(${previousDay})`)
-            .replace("dd/MM", formattedDate)
-            .replace("{sprint}", formValues.sprint);
+          for (const t of tasks) {
+            const taskData = {
+              ...t,
+              title: t.title
+                .replace("{dd/MM/yyyy}", fullDate)
+                .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
+                .replace("{dd/MM}", formattedDate)
+                .replace("{pbi}", formValues.pbi)
+                .replace("{sprint}", formValues.sprint),
+              description: t.description
+                .replace("{dd/MM/yyyy}", fullDate)
+                .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
+                .replace("{dd/MM}", formattedDate)
+                .replace("{pbi}", formValues.pbi)
+                .replace("{sprint}", formValues.sprint),
+            };
 
-          const bodyJson = JSON.stringify([
-            {
-              op: "add",
-              path: "/fields/System.Credentials",
-              value: {
-                usuario: values.usuario,
-                senha: values.senha,
+            const bodyJson = JSON.stringify([
+              {
+                op: "add",
+                path: "/fields/System.Credentials",
+                value: {
+                  usuario: values.usuario,
+                  senha: values.senha,
+                },
               },
-            },
-            {
-              op: "add",
-              path: "/relations/-",
-              value: {
-                rel: "System.LinkTypes.Hierarchy-Reverse",
-                url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
+              {
+                op: "add",
+                path: "/relations/-",
+                value: {
+                  rel: "System.LinkTypes.Hierarchy-Reverse",
+                  url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
+                },
               },
-            },
-            {
-              op: "add",
-              path: "/fields/System.Title",
-              value: taskData.title,
-            },
-            {
-              op: "add",
-              path: "/fields/System.Description",
-              value: taskData.description,
-            },
-            {
-              op: "add",
-              path: "/fields/System.State",
-              value: "To Do",
-            },
-            {
-              op: "add",
-              path: "/fields/System.AreaPath",
-              value: `${project}\\Área de Negócios`,
-            },
-            {
-              op: "add",
-              path: "/fields/System.IterationPath",
-              value: `${project}\\Área de Negócios\\${formValues.sprint}`,
-            },
-            {
-              op: "add",
-              path: "/fields/System.AssignedTo",
-              value: formValues.integrante,
-            },
-            {
-              op: "add",
-              path: "/fields/Custom.SGI.Empresa",
-              value: contrato,
-            },
-            {
-              op: "add",
-              path: "/fields/Custom.SGI.LancamentoAtividadeID",
-              value: taskData.activityId,
-            },
-            {
-              op: "add",
-              path: "/fields/Custom.SGI.AtividadeUST",
-              value: taskData.activity,
-            },
-            {
-              op: "add",
-              path: "/fields/Custom.SGI.ComplexidadeUST",
-              value: taskData.complexity,
-            },
-            {
-              op: "add",
-              path: "/fields/System.CreatedDate",
-              value: d,
-            },
-            {
-              op: "add",
-              path: "/fields/Custom.SGI.DataExecucao",
-              value: d,
-            },
-            // {
-            //   op: "add",
-            //   path: "/fields/Microsoft.VSTS.Common.ClosedDate",
-            //   value: d,
-            // },
-          ]);
+              {
+                op: "add",
+                path: "/fields/System.Title",
+                value: taskData.title,
+              },
+              {
+                op: "add",
+                path: "/fields/System.Description",
+                value: taskData.description,
+              },
+              {
+                op: "add",
+                path: "/fields/System.State",
+                value: "To Do",
+              },
+              {
+                op: "add",
+                path: "/fields/System.AreaPath",
+                value: `${project}\\${taskData.areaPath}`,
+              },
+              {
+                op: "add",
+                path: "/fields/System.IterationPath",
+                value: `${project}\\Área de Negócios\\${formValues.sprint}`,
+              },
+              {
+                op: "add",
+                path: "/fields/System.AssignedTo",
+                value: formValues.integrante,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.Empresa",
+                value: contrato,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.LancamentoAtividadeID",
+                value: taskData.activityId,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.AtividadeUST",
+                value: taskData.activity,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.ComplexidadeUST",
+                value: taskData.complexity,
+              },
+              {
+                op: "add",
+                path: "/fields/System.CreatedDate",
+                value: d,
+              },
+              {
+                op: "add",
+                path: "/fields/Custom.SGI.DataExecucao",
+                value: d,
+              },
+            ]);
 
-          // Envia task normal
-          const response = await fetchClient(`/api/Task`, {
-            method: "POST",
-            body: bodyJson,
-          });
+            const response = await fetchClient(`/api/Task`, {
+              method: "POST",
+              body: bodyJson,
+            });
 
-          if (response.success) {
-            message.success("Task cadastrada com sucesso!");
-          } else {
-            message.error("Erro ao cadastrar a task.");
+            if (response.success) {
+              message.success("Task cadastrada com sucesso!");
+            } else {
+              message.error("Erro ao cadastrar a task.");
+            }
           }
+
         }
       });
     } catch (error) {
@@ -410,18 +346,20 @@ export default function CadastrarTask() {
           <SelectComponent name="Sprint" options={sprints} />
         </Form.Item>
 
-        <Form.Item
-          name="pbi"
-          rules={[{ required: true, message: "Campo obrigatório" }]}
-        >
-          <InputComponent
-            name="PBI"
-            type="number"
-            nameForm={"pbi"}
-            form={form}
-            placeholder="Informe a PBI"
-          />
-        </Form.Item>
+        {tipoTarefa != "personalizado" && (
+          <Form.Item
+            name="pbi"
+            rules={[{ required: true, message: "Campo obrigatório" }]}
+          >
+            <InputComponent
+              name="PBI"
+              type="number"
+              nameForm={"pbi"}
+              form={form}
+              placeholder="Informe a PBI"
+            />
+          </Form.Item>
+        )}
 
         {tipoTarefa === "personalizado" && (
           <Form.Item
