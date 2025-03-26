@@ -129,7 +129,7 @@ export default function CadastrarTask() {
               {
                 op: "add",
                 path: "/fields/System.IterationPath",
-                value: `${project}${taskData.areaPath == 'Área de Negócios' ? '\\Área de Negócios' : ''}\\${formValues.sprint}`,
+                value: `${project}${areaPathPBI.includes('Área de Negócios') ? '\\Área de Negócios' : ''}\\${formValues.sprint}`,
               },
               {
                 op: "add",
