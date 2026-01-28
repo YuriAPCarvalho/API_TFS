@@ -51,6 +51,8 @@ export default function CadastrarTask() {
             label: sprintName,
           };
         });
+        const num = (s: { value: string }) => parseInt(s.value.replace(/\D/g, ''), 10) || 0;
+        sprintsData.sort((a: { value: string }, b: { value: string }) => num(b) - num(a));
         setSprints(sprintsData);
       }
     } catch (error) {
