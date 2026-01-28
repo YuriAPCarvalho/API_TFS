@@ -103,4 +103,27 @@ export const taskTemplates: { [key: string]: (data?: any) => TaskTemplate[] } =
 
       return tasks;
     },
+    "avaliacaopr": (data?: any) => {
+      if (!data || !data.pullRequest) {
+        return [];
+      }
+
+      const pr = data.pullRequest;
+      const prDate = new Date(pr.creationDate);
+      const formattedDate = `${String(prDate.getDate()).padStart(2, '0')}/${String(prDate.getMonth() + 1).padStart(2, '0')}`;
+      const pullRequestId = pr.pullRequestId || pr.id || '';
+      const prName = pr.title || pr.name || '';
+      const prDescription = pr.description || '';
+
+      return [
+        {
+          title: `${formattedDate} - ${pullRequestId} - Avaliação PR - ${prName}`,
+          description: `Avaliação PR <br> Título: ${prName} <br> Descrição: ${prDescription}`,
+          activity: "Atividade de avaliação de código (pull-requests) solicitada a partir do desenvolvimento de uma funcionalidade",
+          activityId: "4338",
+          areaPath: "Área de Negócios",
+          complexity: "Média",
+        },
+      ];
+    },
   };
