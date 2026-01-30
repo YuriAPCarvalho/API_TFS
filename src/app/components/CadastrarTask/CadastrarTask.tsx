@@ -15,6 +15,7 @@ import { taskTemplates } from "@/app/enums/taskTemplates";
 import { tipoTarefas } from "@/app/enums/tipoTarefas";
 import { integrantes } from "@/app/enums/integrantes";
 import { times } from "@/app/enums/times";
+import { areaPath } from "@/app/enums/areaPath";
 import { decryptPassword } from "@/app/utils/encryption";
 
 export default function CadastrarTask() {
@@ -30,8 +31,65 @@ export default function CadastrarTask() {
   const [groupMembersOptions, setGroupMembersOptions] = useState<{ value: string; label: string }[]>([]);
   const [savedUser, setSavedUser] = useState<{ usuario: string; senha: string } | null>(null);
   const [sprints, setSprints] = useState<{ value: string; label: string }[]>([]);
+  const [workItems, setWorkItems] = useState<any[]>([]);
 
   const tipoTarefa = Form.useWatch("tipoTarefa", form);
+  const selectedSprint = Form.useWatch("sprint", form);
+  const selectedAreaPath = Form.useWatch("areaPathPBI", form);
+
+  const areaPathOptions: { value: string; label: string }[] = areaPath.map((node) => ({
+    value: `${node.value}`,
+    label: node.name,
+  }));
+
+  const pbiOptions: { value: string; label: string }[] = useMemo(() => {
+    if (!workItems?.length) return [];
+    return workItems.map((wi: any) => ({
+      value: String(wi.id),
+      label: `${wi.id} - ${wi.fields?.["System.Title"] ?? ""}`.trim(),
+    }));
+  }, [workItems]);
+
+  const fetchWorkItems = async (usuario: string, senha: string, areaPathValue: string, sprintValue: string) => {
+    try {
+      const iterationPath = `${areaPathValue}\\${sprintValue}`;
+      const escapedAreaPath = areaPathValue.replace(/'/g, "''");
+      const isAreaDeNegocios = areaPathValue.includes("Área de Negócios");
+      const areaPathCondition = isAreaDeNegocios
+        ? `([System.AreaPath] = '${escapedAreaPath}' OR [System.AreaPath] = 'CSIS-G08\\Área de Negócios\\Daily Scrum')`
+        : `[System.AreaPath] = '${escapedAreaPath}'`;
+      const query = `SELECT [System.Id], [System.Title], [System.State], [System.AreaPath] FROM WorkItems WHERE [System.TeamProject] = '${project}' AND [System.WorkItemType] = 'Product Backlog Item' AND ${areaPathCondition} AND [System.IterationPath] = '${iterationPath.replace(/'/g, "''")}' AND [System.State] <> 'Removed' AND [System.State] <> 'Closed' AND [System.State] <> 'Done'`;
+      const response = await fetchClient(`/api/GetWorkItems`, {
+        method: "POST",
+        body: JSON.stringify({
+          usuario,
+          senha,
+          query,
+        }),
+      });
+      if (response.success && response.data?.workItems) {
+        setWorkItems(response.data.workItems);
+      } else {
+        setWorkItems([]);
+      }
+    } catch (error) {
+      setWorkItems([]);
+    }
+  };
+
+  useEffect(() => {
+    if (savedUser && selectedSprint && selectedAreaPath) {
+      fetchWorkItems(savedUser.usuario, savedUser.senha, selectedAreaPath, selectedSprint);
+    } else {
+      setWorkItems([]);
+    }
+  }, [savedUser, selectedSprint, selectedAreaPath]);
+
+  useEffect(() => {
+    if (workItems.length === 0) {
+      form.setFieldValue("pbi", undefined);
+    }
+  }, [workItems.length, form]);
 
   const fetchSprints = async (usuario: string, senha: string) => {
     try {
@@ -351,8 +409,9 @@ export default function CadastrarTask() {
                 ]),
               }).then(resp => {
                 const result = resp.data;
-                const areaPath = result.fields["System.AreaPath"];
-                setAreaPathPBI(areaPath)
+                const areaPathFromPbi = result.fields["System.AreaPath"];
+                setAreaPathPBI(areaPathFromPbi);
+                form.setFieldValue("areaPathPBI", areaPathFromPbi);
               });
 
               const bodyJson = JSON.stringify([
@@ -607,18 +666,29 @@ export default function CadastrarTask() {
           <SelectComponent name="Sprint" options={sprints} />
         </Form.Item>
 
+        <Form.Item
+          name="areaPathPBI"
+          rules={[{ required: true, message: "Campo obrigatório" }]}
+        >
+          <SelectComponent name="Área (Area Path)" options={areaPathOptions} />
+        </Form.Item>
+
         {tipoTarefa != "personalizado" && (
           <Form.Item
             name="pbi"
             rules={[{ required: true, message: "Campo obrigatório" }]}
           >
-            <InputComponent
-              name="PBI"
-              type="number"
-              nameForm={"pbi"}
-              form={form}
-              placeholder="Informe a PBI"
-            />
+            {pbiOptions.length > 0 ? (
+              <SelectComponent name="PBI" options={pbiOptions} />
+            ) : (
+              <InputComponent
+                name="PBI"
+                type="number"
+                nameForm={"pbi"}
+                form={form}
+                placeholder="Informe a PBI"
+              />
+            )}
           </Form.Item>
         )}
 
