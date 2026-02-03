@@ -289,7 +289,7 @@ export default function CadastrarTask() {
           {
             op: "add",
             path: "/fields/System.IterationPath",
-            value: `${project}\Área de Negócios\${fv.sprint}`,
+            value: `${project}\\Área de Negócios\\${fv.sprint}`,
           },
           {
             op: "add",
