@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -12,7 +12,6 @@ export default function DateSelectorComponent({ name, onChange }: DateSelectorPr
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
 
   const handleChange = (date: Date | null) => {
-    
     if (date) {
       setSelectedDates((prevDates) => {
         let updatedDates;
@@ -23,11 +22,15 @@ export default function DateSelectorComponent({ name, onChange }: DateSelectorPr
           updatedDates = [...prevDates, date]; // Adiciona a nova data
         }
 
-        onChange?.(updatedDates); // Dispara o onChange com as novas datas
         return updatedDates;
       });
     }
   };
+
+  useEffect(() => {
+    // Notifica o pai somente após a atualização do estado (evita setState durante render)
+    onChange?.(selectedDates);
+  }, [selectedDates, onChange]);
 
   return (
     <div className="flex flex-col gap-2 w-[300px]">
