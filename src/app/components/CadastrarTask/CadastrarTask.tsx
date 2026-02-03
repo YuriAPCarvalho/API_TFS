@@ -141,13 +141,9 @@ export default function CadastrarTask() {
 
     try {
       if (savedUser) {
-        await handleLoginSuccess(savedUser);
+        await handleLoginSuccess(savedUser, values);
       } else {
         setIsModalOpen(true);
-      }
-
-      if (values.arquivo != null) {
-        handleFileUpload(values.arquivo);
       }
     } catch (error) {
       message.error("Erro ao processar formulário.");
@@ -183,8 +179,9 @@ export default function CadastrarTask() {
     } catch (error) {}
   };
 
-  const fetchPullRequests = async (usuario: string, senha: string) => {
+  const fetchPullRequests = async (usuario: string, senha: string, submittedFormValues?: any) => {
     try {
+      const fv = submittedFormValues || formValues;
       const response = await fetchClient(`/api/GetPullRequests`, {
         method: "POST",
         body: JSON.stringify({
@@ -220,8 +217,8 @@ export default function CadastrarTask() {
           `${filteredPRs.length} pull requests encontrados${selectedDates.length > 0 ? " para as datas selecionadas" : ""}`,
         );
 
-        if (filteredPRs.length > 0 && formValues?.tipoTarefa === "analisepr" && selectedDates.length > 0) {
-          await createTasksFromPullRequests(filteredPRs, usuario, senha);
+        if (filteredPRs.length > 0 && fv?.tipoTarefa === "analisepr" && selectedDates.length > 0) {
+          await createTasksFromPullRequests(filteredPRs, usuario, senha, fv);
         }
       } else {
         message.error("Erro ao buscar pull requests");
@@ -231,9 +228,10 @@ export default function CadastrarTask() {
     }
   };
 
-  const createTasksFromPullRequests = async (prs: any[], usuario: string, senha: string) => {
+  const createTasksFromPullRequests = async (prs: any[], usuario: string, senha: string, submittedFormValues?: any) => {
     try {
-      if (!formValues || !savedUser) {
+      const fv = submittedFormValues || formValues;
+      if (!fv || !usuario || !senha) {
         message.error("Dados do formulário não encontrados");
         return;
       }
@@ -265,7 +263,7 @@ export default function CadastrarTask() {
             path: "/relations/-",
             value: {
               rel: "System.LinkTypes.Hierarchy-Reverse",
-              url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
+              url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${fv.pbi}`,
             },
           },
           {
@@ -291,12 +289,12 @@ export default function CadastrarTask() {
           {
             op: "add",
             path: "/fields/System.IterationPath",
-            value: `${project}\\Área de Negócios\\${formValues.sprint}`,
+            value: `${project}\Área de Negócios\${fv.sprint}`,
           },
           {
             op: "add",
             path: "/fields/System.AssignedTo",
-            value: formValues.integrante,
+            value: fv.integrante,
           },
           {
             op: "add",
@@ -349,18 +347,19 @@ export default function CadastrarTask() {
     }
   };
 
-  const handleLoginSuccess = async (values: any) => {
+  const handleLoginSuccess = async (values: any, submittedFormValues?: any) => {
     setLoading(true);
     try {
+      const fv = submittedFormValues || formValues;
       await fetchSprints(values.usuario, values.senha);
 
-      if (formValues?.tipoTarefa === "analisepr") {
+      if (fv?.tipoTarefa === "analisepr") {
         await Promise.all([
           fetchGroupMembers(values.usuario, values.senha),
-          fetchPullRequests(values.usuario, values.senha),
+          fetchPullRequests(values.usuario, values.senha, fv),
         ]);
       } else {
-        formValues.data.map(async (d: any) => {
+        fv.data.map(async (d: any) => {
           const date = new Date(d);
           const formattedDate = format(date, "dd/MM");
           const fullDate = format(date, "dd/MM/yyyy");
@@ -379,7 +378,7 @@ export default function CadastrarTask() {
                 .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
                 .replace("{dd/MM}", formattedDate)
                 .replace("{pbi}", t.pbi)
-                .replace("{sprint}", formValues.sprint);
+                .replace("{sprint}", fv.sprint);
 
               let taskData = {
                 ...t,
@@ -391,7 +390,7 @@ export default function CadastrarTask() {
                 .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
                 .replace("{dd/MM}", formattedDate)
                 .replace("{pbi}", taskData.pbi)
-                .replace("{sprint}", formValues.sprint);
+                .replace("{sprint}", fv.sprint);
 
               fetchClient(`/api/GetTask?pbi=${taskData.pbi}`, {
                 method: "POST",
@@ -452,12 +451,12 @@ export default function CadastrarTask() {
                 {
                   op: "add",
                   path: "/fields/System.IterationPath",
-                  value: `${project}${areaPathPBI.includes("Área de Negócios") ? "\\Área de Negócios" : ""}\\${formValues.sprint}`,
+                  value: `${project}${areaPathPBI.includes("Área de Negócios") ? "\\Área de Negócios" : ""}\\${fv.sprint}`,
                 },
                 {
                   op: "add",
                   path: "/fields/System.AssignedTo",
-                  value: formValues.integrante,
+                  value: fv.integrante,
                 },
                 {
                   op: "add",
@@ -507,7 +506,7 @@ export default function CadastrarTask() {
               message.error("Erro ao cadastrar algumas tasks.");
             }
           } else {
-            const taskTemplateResult = taskTemplates[formValues.tipoTarefa]();
+            const taskTemplateResult = taskTemplates[fv.tipoTarefa]();
             const tasks = Array.isArray(taskTemplateResult) ? taskTemplateResult : [taskTemplateResult];
 
             for (const t of tasks) {
@@ -517,14 +516,14 @@ export default function CadastrarTask() {
                   .replace("{dd/MM/yyyy}", fullDate)
                   .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
                   .replace("{dd/MM}", formattedDate)
-                  .replace("{pbi}", formValues.pbi)
-                  .replace("{sprint}", formValues.sprint),
+                  .replace("{pbi}", fv.pbi)
+                  .replace("{sprint}", fv.sprint),
                 description: t.description
                   .replace("{dd/MM/yyyy}", fullDate)
                   .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
                   .replace("{dd/MM}", formattedDate)
-                  .replace("{pbi}", formValues.pbi)
-                  .replace("{sprint}", formValues.sprint),
+                  .replace("{pbi}", fv.pbi)
+                  .replace("{sprint}", fv.sprint),
               };
 
               const bodyJson = JSON.stringify([
@@ -541,7 +540,7 @@ export default function CadastrarTask() {
                   path: "/relations/-",
                   value: {
                     rel: "System.LinkTypes.Hierarchy-Reverse",
-                    url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${formValues.pbi}`,
+                    url: `https://tfs.sgi.ms.gov.br/tfs/Global/_apis/wit/workitems/${fv.pbi}`,
                   },
                 },
                 {
@@ -567,12 +566,12 @@ export default function CadastrarTask() {
                 {
                   op: "add",
                   path: "/fields/System.IterationPath",
-                  value: `${project}\\Área de Negócios\\${formValues.sprint}`,
+                  value: `${project}\\Área de Negócios\\${fv.sprint}`,
                 },
                 {
                   op: "add",
                   path: "/fields/System.AssignedTo",
-                  value: formValues.integrante,
+                  value: fv.integrante,
                 },
                 {
                   op: "add",
