@@ -359,7 +359,8 @@ export default function CadastrarTask() {
           fetchPullRequests(values.usuario, values.senha, fv),
         ]);
       } else {
-        fv.data.map(async (d: any) => {
+        const dates = fv.data.slice().sort((a: any, b: any) => new Date(a).getTime() - new Date(b).getTime());
+        for (const d of dates) {
           const date = new Date(d);
           const formattedDate = format(date, "dd/MM");
           const fullDate = format(date, "dd/MM/yyyy");
@@ -619,7 +620,7 @@ export default function CadastrarTask() {
               }
             }
           }
-        });
+        }
       }
     } catch (error) {
       message.error("Erro ao cadastrar.");
