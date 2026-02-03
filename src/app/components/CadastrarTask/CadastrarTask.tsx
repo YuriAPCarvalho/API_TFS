@@ -103,18 +103,17 @@ export default function CadastrarTask() {
 
       if (response.success && response.data?.value) {
         const sprintsData = response.data.value.map((iteration: any) => {
-          const sprintName = iteration.path?.split('\\').pop() || iteration.name || 'Sprint';
+          const sprintName = iteration.path?.split("\\").pop() || iteration.name || "Sprint";
           return {
             value: sprintName,
             label: sprintName,
           };
         });
-        const num = (s: { value: string }) => parseInt(s.value.replace(/\D/g, ''), 10) || 0;
+        const num = (s: { value: string }) => parseInt(s.value.replace(/\D/g, ""), 10) || 0;
         sprintsData.sort((a: { value: string }, b: { value: string }) => num(b) - num(a));
         setSprints(sprintsData);
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -131,8 +130,7 @@ export default function CadastrarTask() {
           setSavedUser(decryptedUser);
           fetchSprints(decryptedUser.usuario, decryptedUser.senha);
           fetchGroupMembers(decryptedUser.usuario, decryptedUser.senha);
-        } catch (error) {
-        }
+        } catch (error) {}
       }
     }
   }, []);
@@ -140,14 +138,14 @@ export default function CadastrarTask() {
   const handleSubmit = async (values: any) => {
     setFormValues(values);
     setLoading(true);
-    
+
     try {
       if (savedUser) {
         await handleLoginSuccess(savedUser);
       } else {
         setIsModalOpen(true);
       }
-      
+
       if (values.arquivo != null) {
         handleFileUpload(values.arquivo);
       }
@@ -168,22 +166,21 @@ export default function CadastrarTask() {
           maxResults: 100,
         }),
       });
-      
+
       if (response.success && response.data?.identities) {
         setGroupMembers(response.data.identities);
-        
+
         const membersOptions = response.data.identities.map((identity: any) => {
-          const friendlyName = identity.FriendlyDisplayName || identity.DisplayName || identity.name || 'Sem nome';
+          const friendlyName = identity.FriendlyDisplayName || identity.DisplayName || identity.name || "Sem nome";
           return {
             value: friendlyName,
             label: friendlyName,
           };
         });
-        
+
         setGroupMembersOptions(membersOptions);
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const fetchPullRequests = async (usuario: string, senha: string) => {
@@ -196,35 +193,33 @@ export default function CadastrarTask() {
         }),
       });
       console.log(response);
-      
+
       if (response.success && response.data?.value) {
         let filteredPRs = response.data.value;
-        
+
         if (selectedDates.length > 0) {
           const selectedDatesOnly = selectedDates.map((date: Date) => {
             const d = new Date(date);
             return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
           });
-          
+
           filteredPRs = response.data.value.filter((pr: any) => {
             if (!pr.creationDate) return false;
-            
+
             const prDate = new Date(pr.creationDate);
-            const prDateOnly = new Date(
-              prDate.getFullYear(),
-              prDate.getMonth(),
-              prDate.getDate()
-            ).getTime();
-            
+            const prDateOnly = new Date(prDate.getFullYear(), prDate.getMonth(), prDate.getDate()).getTime();
+
             return selectedDatesOnly.includes(prDateOnly);
           });
 
           console.log(filteredPRs);
         }
-        
+
         setPullRequests(filteredPRs);
-        message.success(`${filteredPRs.length} pull requests encontrados${selectedDates.length > 0 ? ' para as datas selecionadas' : ''}`);
-        
+        message.success(
+          `${filteredPRs.length} pull requests encontrados${selectedDates.length > 0 ? " para as datas selecionadas" : ""}`,
+        );
+
         if (filteredPRs.length > 0 && formValues?.tipoTarefa === "analisepr" && selectedDates.length > 0) {
           await createTasksFromPullRequests(filteredPRs, usuario, senha);
         }
@@ -246,10 +241,10 @@ export default function CadastrarTask() {
       const promises = prs.map(async (pr: any) => {
         const prDate = new Date(pr.creationDate);
         const prDateISO = prDate.toISOString();
-        
+
         const taskTemplateResult = taskTemplates["avaliacaopr"]({ pullRequest: pr });
         const tasks = Array.isArray(taskTemplateResult) ? taskTemplateResult : [taskTemplateResult];
-        
+
         if (tasks.length === 0) {
           return { success: false };
         }
@@ -343,7 +338,7 @@ export default function CadastrarTask() {
 
       const results = await Promise.all(promises);
       const successCount = results.filter((resp) => resp?.success).length;
-      
+
       if (successCount === prs.length) {
         message.success(`${successCount} tarefas criadas com sucesso!`);
       } else {
@@ -358,7 +353,7 @@ export default function CadastrarTask() {
     setLoading(true);
     try {
       await fetchSprints(values.usuario, values.senha);
-      
+
       if (formValues?.tipoTarefa === "analisepr") {
         await Promise.all([
           fetchGroupMembers(values.usuario, values.senha),
@@ -371,6 +366,9 @@ export default function CadastrarTask() {
           const fullDate = format(date, "dd/MM/yyyy");
           const previousDayDate = new Date(date);
           previousDayDate.setDate(previousDayDate.getDate() - 1);
+          while (previousDayDate.getDay() === 0 || previousDayDate.getDay() === 6) {
+            previousDayDate.setDate(previousDayDate.getDate() - 1);
+          }
           const previousDay = format(previousDayDate, "dd/MM");
           const dISO = date.toISOString();
 
@@ -407,7 +405,7 @@ export default function CadastrarTask() {
                     },
                   },
                 ]),
-              }).then(resp => {
+              }).then((resp) => {
                 const result = resp.data;
                 const areaPathFromPbi = result.fields["System.AreaPath"];
                 setAreaPathPBI(areaPathFromPbi);
@@ -454,7 +452,7 @@ export default function CadastrarTask() {
                 {
                   op: "add",
                   path: "/fields/System.IterationPath",
-                  value: `${project}${areaPathPBI.includes('Área de Negócios') ? '\\Área de Negócios' : ''}\\${formValues.sprint}`,
+                  value: `${project}${areaPathPBI.includes("Área de Negócios") ? "\\Área de Negócios" : ""}\\${formValues.sprint}`,
                 },
                 {
                   op: "add",
@@ -609,7 +607,7 @@ export default function CadastrarTask() {
               ]);
 
               console.log(bodyJson);
-              
+
               const response = await fetchClient(`/api/Task`, {
                 method: "POST",
                 body: bodyJson,
@@ -637,8 +635,7 @@ export default function CadastrarTask() {
     try {
       const message = await processExcelFile(file, additionalParams);
       setTaskExcel(message);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   return (
@@ -646,48 +643,25 @@ export default function CadastrarTask() {
       <div className={Style.titleDiv}>
         <h1 className={Style.title}>Cadastrar Task</h1>
       </div>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        className="grid grid-cols-3 gap-4"
-      >
-        <Form.Item
-          name="tipoTarefa"
-          rules={[{ required: true, message: "Campo obrigatório" }]}
-        >
+      <Form form={form} layout="vertical" onFinish={handleSubmit} className="grid grid-cols-3 gap-4">
+        <Form.Item name="tipoTarefa" rules={[{ required: true, message: "Campo obrigatório" }]}>
           <SelectComponent name="Tipo de Tarefa" options={tipoTarefas} />
         </Form.Item>
 
-        <Form.Item
-          name="sprint"
-          rules={[{ required: true, message: "Campo obrigatório" }]}
-        >
+        <Form.Item name="sprint" rules={[{ required: true, message: "Campo obrigatório" }]}>
           <SelectComponent name="Sprint" options={sprints} />
         </Form.Item>
 
-        <Form.Item
-          name="areaPathPBI"
-          rules={[{ required: true, message: "Campo obrigatório" }]}
-        >
+        <Form.Item name="areaPathPBI" rules={[{ required: true, message: "Campo obrigatório" }]}>
           <SelectComponent name="Área (Area Path)" options={areaPathOptions} />
         </Form.Item>
 
         {tipoTarefa != "personalizado" && (
-          <Form.Item
-            name="pbi"
-            rules={[{ required: true, message: "Campo obrigatório" }]}
-          >
+          <Form.Item name="pbi" rules={[{ required: true, message: "Campo obrigatório" }]}>
             {pbiOptions.length > 0 ? (
               <SelectComponent name="PBI" options={pbiOptions} />
             ) : (
-              <InputComponent
-                name="PBI"
-                type="number"
-                nameForm={"pbi"}
-                form={form}
-                placeholder="Informe a PBI"
-              />
+              <InputComponent name="PBI" type="number" nameForm={"pbi"} form={form} placeholder="Informe a PBI" />
             )}
           </Form.Item>
         )}
@@ -709,17 +683,11 @@ export default function CadastrarTask() {
           </Form.Item>
         )}
 
-        <Form.Item
-          name="time"
-          rules={[{ required: true, message: "Campo obrigatório" }]}
-        >
+        <Form.Item name="time" rules={[{ required: true, message: "Campo obrigatório" }]}>
           <SelectComponent name="Time" options={times} />
         </Form.Item>
 
-        <Form.Item
-          name="integrante"
-          rules={[{ required: true, message: "Campo obrigatório" }]}
-        >
+        <Form.Item name="integrante" rules={[{ required: true, message: "Campo obrigatório" }]}>
           <SelectComponent name="Integrante" options={groupMembersOptions} />
         </Form.Item>
 
@@ -729,9 +697,7 @@ export default function CadastrarTask() {
             {
               required: true,
               validator: (_, value) =>
-                selectedDates.length > 0
-                  ? Promise.resolve()
-                  : Promise.reject("Selecione pelo menos uma data."),
+                selectedDates.length > 0 ? Promise.resolve() : Promise.reject("Selecione pelo menos uma data."),
             },
           ]}
         >
@@ -739,12 +705,7 @@ export default function CadastrarTask() {
         </Form.Item>
 
         <Form.Item className="col-span-3 flex justify-center">
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            className="w-[200px] bg-verde hover:!bg-verde-500"
-          >
+          <Button type="primary" htmlType="submit" loading={loading} className="w-[200px] bg-verde hover:!bg-verde-500">
             Criar Tarefa
           </Button>
         </Form.Item>
