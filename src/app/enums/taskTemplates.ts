@@ -15,7 +15,7 @@ export const taskTemplates: { [key: string]: (data?: any) => TaskTemplate[] } = 
     {
       title: "{dd/MM} - Reunião Diária",
       description:
-        "Data: {dd/MM/yyyy} <br> <br>Relato das tarefas realizadas no dia anterior {dda/MMa} <br>Relatos das tarefas planejadas para o dia {dda/MMa} <br> <br>Sem Impedimentos.",
+        "Data: {dd/MM/yyyy} <br> <br>Relato das tarefas realizadas no dia anterior {dda/MMa} <br>Relatos das tarefas planejadas para o dia {dd/MM} <br> <br>Sem Impedimentos.",
       activity: "Cerimônias/Reuniões - Reunião Diária",
       activityId: "4476",
       areaPath: "Área de Negócios",
