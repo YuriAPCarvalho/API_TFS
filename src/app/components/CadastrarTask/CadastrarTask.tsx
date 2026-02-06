@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
-import { Form, Button, message } from "antd";
+import { Form, Button, message, Select } from "antd";
 import Style from "./style.module.scss";
 import SelectComponent from "../Select/Select";
 import InputComponent from "../Input/Input";
@@ -90,6 +90,12 @@ export default function CadastrarTask() {
       form.setFieldValue("pbi", undefined);
     }
   }, [workItems.length, form]);
+
+  useEffect(() => {
+    if (tipoTarefa === "feedback-colaborador" && savedUser && groupMembersOptions.length === 0) {
+      fetchGroupMembers(savedUser.usuario, savedUser.senha);
+    }
+  }, [tipoTarefa, savedUser]);
 
   const fetchSprints = async (usuario: string, senha: string) => {
     try {
@@ -507,8 +513,23 @@ export default function CadastrarTask() {
               message.error("Erro ao cadastrar algumas tasks.");
             }
           } else {
-            const taskTemplateResult = taskTemplates[fv.tipoTarefa]();
-            const tasks = Array.isArray(taskTemplateResult) ? taskTemplateResult : [taskTemplateResult];
+            let tasks: any[];
+            if (fv.tipoTarefa === "feedback-colaborador") {
+              const colaboradores = Array.isArray(fv.colaboradores) ? fv.colaboradores : [];
+              if (colaboradores.length === 0) {
+                message.warning("Selecione pelo menos um colaborador para Feedback por colaborador.");
+                break;
+              }
+              const base = taskTemplates[fv.tipoTarefa]()[0];
+              tasks = colaboradores.map((colab: string) => ({
+                ...base,
+                title: base.title.replace(/{colaborador}/g, colab),
+                description: base.description.replace(/{colaborador}/g, colab),
+              }));
+            } else {
+              const taskTemplateResult = taskTemplates[fv.tipoTarefa]();
+              tasks = Array.isArray(taskTemplateResult) ? taskTemplateResult : [taskTemplateResult];
+            }
 
             for (const t of tasks) {
               const taskData = {
@@ -656,7 +677,7 @@ export default function CadastrarTask() {
           <SelectComponent name="Área (Area Path)" options={areaPathOptions} />
         </Form.Item>
 
-        {tipoTarefa != "personalizado" && (
+        {tipoTarefa != "personalizado" && tipoTarefa !== "feedback-colaborador" && (
           <Form.Item name="pbi" rules={[{ required: true, message: "Campo obrigatório" }]}>
             {pbiOptions.length > 0 ? (
               <SelectComponent name="PBI" options={pbiOptions} />
@@ -664,6 +685,42 @@ export default function CadastrarTask() {
               <InputComponent name="PBI" type="number" nameForm={"pbi"} form={form} placeholder="Informe a PBI" />
             )}
           </Form.Item>
+        )}
+
+        {tipoTarefa === "feedback-colaborador" && (
+          <>
+            <Form.Item name="pbi" rules={[{ required: true, message: "Campo obrigatório" }]}>
+              {pbiOptions.length > 0 ? (
+                <SelectComponent name="PBI" options={pbiOptions} />
+              ) : (
+                <InputComponent name="PBI" type="number" nameForm={"pbi"} form={form} placeholder="Informe a PBI" />
+              )}
+            </Form.Item>
+            <Form.Item
+              name="colaboradores"
+              label="Colaboradores"
+              rules={[
+                {
+                  required: true,
+                  message: "Selecione pelo menos um colaborador",
+                },
+                {
+                  type: "array",
+                  min: 1,
+                  message: "Selecione pelo menos um colaborador",
+                },
+              ]}
+            >
+              <Select
+                mode="multiple"
+                placeholder="Selecione os colaboradores (1 ou mais)"
+                options={groupMembersOptions}
+                allowClear
+                className="w-full"
+                style={{ minWidth: 300 }}
+              />
+            </Form.Item>
+          </>
         )}
 
         {tipoTarefa === "personalizado" && (
