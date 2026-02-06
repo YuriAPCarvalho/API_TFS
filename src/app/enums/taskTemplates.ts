@@ -102,6 +102,16 @@ export const taskTemplates: { [key: string]: (data?: any) => TaskTemplate[] } = 
 
     return tasks;
   },
+  "feedback-colaborador": () => [
+    {
+      title: "{dd/MM} - Feedback - {colaborador}",
+      description: "Realizar feedback com o colaborador {colaborador}.",
+      activity: "Feedback por colaborador",
+      activityId: "4386",
+      areaPath: "Área de Negócios",
+      complexity: "Única",
+    },
+  ],
   avaliacaopr: (data?: any) => {
     if (!data || !data.pullRequest) {
       return [];

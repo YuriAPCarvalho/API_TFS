@@ -5,5 +5,6 @@ export const tipoTarefas = [
     { value: "planning", label: "Planejamento" },
     { value: "monitoramento-k8s", label: "Monitoramento K8S" },
     { value: "analisepr", label: "Análise de PR" },
+    { value: "feedback-colaborador", label: "Feedback por colaborador" },
     { value: "personalizado", label: "Personalizado" },
 ];
