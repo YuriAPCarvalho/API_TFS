@@ -28,19 +28,28 @@ export default function CadastrarTask() {
   const [areaPathPBI, setAreaPathPBI] = useState<any>(null);
   const [pullRequests, setPullRequests] = useState<any[]>([]);
   const [groupMembers, setGroupMembers] = useState<any[]>([]);
-  const [groupMembersOptions, setGroupMembersOptions] = useState<{ value: string; label: string }[]>([]);
-  const [savedUser, setSavedUser] = useState<{ usuario: string; senha: string } | null>(null);
-  const [sprints, setSprints] = useState<{ value: string; label: string }[]>([]);
+  const [groupMembersOptions, setGroupMembersOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [savedUser, setSavedUser] = useState<{
+    usuario: string;
+    senha: string;
+  } | null>(null);
+  const [sprints, setSprints] = useState<{ value: string; label: string }[]>(
+    [],
+  );
   const [workItems, setWorkItems] = useState<any[]>([]);
 
   const tipoTarefa = Form.useWatch("tipoTarefa", form);
   const selectedSprint = Form.useWatch("sprint", form);
   const selectedAreaPath = Form.useWatch("areaPathPBI", form);
 
-  const areaPathOptions: { value: string; label: string }[] = areaPath.map((node) => ({
-    value: `${node.value}`,
-    label: node.name,
-  }));
+  const areaPathOptions: { value: string; label: string }[] = areaPath.map(
+    (node) => ({
+      value: `${node.value}`,
+      label: node.name,
+    }),
+  );
 
   const pbiOptions: { value: string; label: string }[] = useMemo(() => {
     if (!workItems?.length) return [];
@@ -50,7 +59,12 @@ export default function CadastrarTask() {
     }));
   }, [workItems]);
 
-  const fetchWorkItems = async (usuario: string, senha: string, areaPathValue: string, sprintValue: string) => {
+  const fetchWorkItems = async (
+    usuario: string,
+    senha: string,
+    areaPathValue: string,
+    sprintValue: string,
+  ) => {
     try {
       const iterationPath = `${areaPathValue}\\${sprintValue}`;
       const escapedAreaPath = areaPathValue.replace(/'/g, "''");
@@ -58,7 +72,7 @@ export default function CadastrarTask() {
       const areaPathCondition = isAreaDeNegocios
         ? `([System.AreaPath] = '${escapedAreaPath}' OR [System.AreaPath] = 'CSIS-G08\\Área de Negócios\\Daily Scrum')`
         : `[System.AreaPath] = '${escapedAreaPath}'`;
-      const query = `SELECT [System.Id], [System.Title], [System.State], [System.AreaPath] FROM WorkItems WHERE [System.TeamProject] = '${project}' AND [System.WorkItemType] = 'Product Backlog Item' AND ${areaPathCondition} AND [System.IterationPath] = '${iterationPath.replace(/'/g, "''")}' AND [System.State] <> 'Removed' AND [System.State] <> 'Closed' AND [System.State] <> 'Done'`;
+      const query = `SELECT [System.Id], [System.Title], [System.State], [System.AreaPath] FROM WorkItems WHERE [System.TeamProject] = '${project}' AND [System.WorkItemType] = 'Product Backlog Item' AND ${areaPathCondition} AND [System.IterationPath] = '${iterationPath.replace(/'/g, "''")}' AND [System.State] <> 'Removed' AND [System.State] <> 'Closed'`;
       const response = await fetchClient(`/api/GetWorkItems`, {
         method: "POST",
         body: JSON.stringify({
@@ -79,22 +93,34 @@ export default function CadastrarTask() {
 
   useEffect(() => {
     if (savedUser && selectedSprint && selectedAreaPath) {
-      fetchWorkItems(savedUser.usuario, savedUser.senha, selectedAreaPath, selectedSprint);
+      fetchWorkItems(
+        savedUser.usuario,
+        savedUser.senha,
+        selectedAreaPath,
+        selectedSprint,
+      );
     } else {
       setWorkItems([]);
+      const currentPbi = form.getFieldValue("pbi");
+      if (
+        currentPbi !== undefined &&
+        currentPbi !== null &&
+        currentPbi !== ""
+      ) {
+        form.setFieldValue("pbi", undefined);
+      }
     }
   }, [savedUser, selectedSprint, selectedAreaPath]);
 
   useEffect(() => {
-    if (workItems.length === 0) {
-      form.setFieldValue("pbi", undefined);
-    }
-  }, [workItems.length, form]);
-
-  useEffect(() => {
-    if (tipoTarefa === "feedback-colaborador" && savedUser && groupMembersOptions.length === 0) {
+    if (
+      tipoTarefa === "feedback-colaborador" &&
+      savedUser &&
+      groupMembersOptions.length === 0
+    ) {
       fetchGroupMembers(savedUser.usuario, savedUser.senha);
     }
+    // Não incluir groupMembersOptions: ao preencher após o fetch, o efeito não deve rodar de novo
   }, [tipoTarefa, savedUser]);
 
   const fetchSprints = async (usuario: string, senha: string) => {
@@ -109,14 +135,18 @@ export default function CadastrarTask() {
 
       if (response.success && response.data?.value) {
         const sprintsData = response.data.value.map((iteration: any) => {
-          const sprintName = iteration.path?.split("\\").pop() || iteration.name || "Sprint";
+          const sprintName =
+            iteration.path?.split("\\").pop() || iteration.name || "Sprint";
           return {
             value: sprintName,
             label: sprintName,
           };
         });
-        const num = (s: { value: string }) => parseInt(s.value.replace(/\D/g, ""), 10) || 0;
-        sprintsData.sort((a: { value: string }, b: { value: string }) => num(b) - num(a));
+        const num = (s: { value: string }) =>
+          parseInt(s.value.replace(/\D/g, ""), 10) || 0;
+        sprintsData.sort(
+          (a: { value: string }, b: { value: string }) => num(b) - num(a),
+        );
         setSprints(sprintsData);
       }
     } catch (error) {}
@@ -173,7 +203,11 @@ export default function CadastrarTask() {
         setGroupMembers(response.data.identities);
 
         const membersOptions = response.data.identities.map((identity: any) => {
-          const friendlyName = identity.FriendlyDisplayName || identity.DisplayName || identity.name || "Sem nome";
+          const friendlyName =
+            identity.FriendlyDisplayName ||
+            identity.DisplayName ||
+            identity.name ||
+            "Sem nome";
           return {
             value: friendlyName,
             label: friendlyName,
@@ -185,7 +219,11 @@ export default function CadastrarTask() {
     } catch (error) {}
   };
 
-  const fetchPullRequests = async (usuario: string, senha: string, submittedFormValues?: any) => {
+  const fetchPullRequests = async (
+    usuario: string,
+    senha: string,
+    submittedFormValues?: any,
+  ) => {
     try {
       const fv = submittedFormValues || formValues;
       const response = await fetchClient(`/api/GetPullRequests`, {
@@ -203,14 +241,22 @@ export default function CadastrarTask() {
         if (selectedDates.length > 0) {
           const selectedDatesOnly = selectedDates.map((date: Date) => {
             const d = new Date(date);
-            return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+            return new Date(
+              d.getFullYear(),
+              d.getMonth(),
+              d.getDate(),
+            ).getTime();
           });
 
           filteredPRs = response.data.value.filter((pr: any) => {
             if (!pr.creationDate) return false;
 
             const prDate = new Date(pr.creationDate);
-            const prDateOnly = new Date(prDate.getFullYear(), prDate.getMonth(), prDate.getDate()).getTime();
+            const prDateOnly = new Date(
+              prDate.getFullYear(),
+              prDate.getMonth(),
+              prDate.getDate(),
+            ).getTime();
 
             return selectedDatesOnly.includes(prDateOnly);
           });
@@ -223,7 +269,11 @@ export default function CadastrarTask() {
           `${filteredPRs.length} pull requests encontrados${selectedDates.length > 0 ? " para as datas selecionadas" : ""}`,
         );
 
-        if (filteredPRs.length > 0 && fv?.tipoTarefa === "analisepr" && selectedDates.length > 0) {
+        if (
+          filteredPRs.length > 0 &&
+          fv?.tipoTarefa === "analisepr" &&
+          selectedDates.length > 0
+        ) {
           await createTasksFromPullRequests(filteredPRs, usuario, senha, fv);
         }
       } else {
@@ -234,7 +284,12 @@ export default function CadastrarTask() {
     }
   };
 
-  const createTasksFromPullRequests = async (prs: any[], usuario: string, senha: string, submittedFormValues?: any) => {
+  const createTasksFromPullRequests = async (
+    prs: any[],
+    usuario: string,
+    senha: string,
+    submittedFormValues?: any,
+  ) => {
     try {
       const fv = submittedFormValues || formValues;
       if (!fv || !usuario || !senha) {
@@ -246,8 +301,12 @@ export default function CadastrarTask() {
         const prDate = new Date(pr.creationDate);
         const prDateISO = prDate.toISOString();
 
-        const taskTemplateResult = taskTemplates["avaliacaopr"]({ pullRequest: pr });
-        const tasks = Array.isArray(taskTemplateResult) ? taskTemplateResult : [taskTemplateResult];
+        const taskTemplateResult = taskTemplates["avaliacaopr"]({
+          pullRequest: pr,
+        });
+        const tasks = Array.isArray(taskTemplateResult)
+          ? taskTemplateResult
+          : [taskTemplateResult];
 
         if (tasks.length === 0) {
           return { success: false };
@@ -346,7 +405,9 @@ export default function CadastrarTask() {
       if (successCount === prs.length) {
         message.success(`${successCount} tarefas criadas com sucesso!`);
       } else {
-        message.warning(`${successCount} de ${prs.length} tarefas criadas com sucesso.`);
+        message.warning(
+          `${successCount} de ${prs.length} tarefas criadas com sucesso.`,
+        );
       }
     } catch (error) {
       message.error("Erro ao criar tarefas a partir dos pull requests");
@@ -365,14 +426,21 @@ export default function CadastrarTask() {
           fetchPullRequests(values.usuario, values.senha, fv),
         ]);
       } else {
-        const dates = fv.data.slice().sort((a: any, b: any) => new Date(a).getTime() - new Date(b).getTime());
+        const dates = fv.data
+          .slice()
+          .sort(
+            (a: any, b: any) => new Date(a).getTime() - new Date(b).getTime(),
+          );
         for (const d of dates) {
           const date = new Date(d);
           const formattedDate = format(date, "dd/MM");
           const fullDate = format(date, "dd/MM/yyyy");
           const previousDayDate = new Date(date);
           previousDayDate.setDate(previousDayDate.getDate() - 1);
-          while (previousDayDate.getDay() === 0 || previousDayDate.getDay() === 6) {
+          while (
+            previousDayDate.getDay() === 0 ||
+            previousDayDate.getDay() === 6
+          ) {
             previousDayDate.setDate(previousDayDate.getDate() - 1);
           }
           const previousDay = format(previousDayDate, "dd/MM");
@@ -515,9 +583,13 @@ export default function CadastrarTask() {
           } else {
             let tasks: any[];
             if (fv.tipoTarefa === "feedback-colaborador") {
-              const colaboradores = Array.isArray(fv.colaboradores) ? fv.colaboradores : [];
+              const colaboradores = Array.isArray(fv.colaboradores)
+                ? fv.colaboradores
+                : [];
               if (colaboradores.length === 0) {
-                message.warning("Selecione pelo menos um colaborador para Feedback por colaborador.");
+                message.warning(
+                  "Selecione pelo menos um colaborador para Feedback por colaborador.",
+                );
                 break;
               }
               const base = taskTemplates[fv.tipoTarefa]()[0];
@@ -528,7 +600,9 @@ export default function CadastrarTask() {
               }));
             } else {
               const taskTemplateResult = taskTemplates[fv.tipoTarefa]();
-              tasks = Array.isArray(taskTemplateResult) ? taskTemplateResult : [taskTemplateResult];
+              tasks = Array.isArray(taskTemplateResult)
+                ? taskTemplateResult
+                : [taskTemplateResult];
             }
 
             for (const t of tasks) {
@@ -664,36 +738,69 @@ export default function CadastrarTask() {
       <div className={Style.titleDiv}>
         <h1 className={Style.title}>Cadastrar Task</h1>
       </div>
-      <Form form={form} layout="vertical" onFinish={handleSubmit} className="grid grid-cols-3 gap-4">
-        <Form.Item name="tipoTarefa" rules={[{ required: true, message: "Campo obrigatório" }]}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        className="grid grid-cols-3 gap-4"
+      >
+        <Form.Item
+          name="tipoTarefa"
+          rules={[{ required: true, message: "Campo obrigatório" }]}
+        >
           <SelectComponent name="Tipo de Tarefa" options={tipoTarefas} />
         </Form.Item>
 
-        <Form.Item name="sprint" rules={[{ required: true, message: "Campo obrigatório" }]}>
+        <Form.Item
+          name="sprint"
+          rules={[{ required: true, message: "Campo obrigatório" }]}
+        >
           <SelectComponent name="Sprint" options={sprints} />
         </Form.Item>
 
-        <Form.Item name="areaPathPBI" rules={[{ required: true, message: "Campo obrigatório" }]}>
+        <Form.Item
+          name="areaPathPBI"
+          rules={[{ required: true, message: "Campo obrigatório" }]}
+        >
           <SelectComponent name="Área (Area Path)" options={areaPathOptions} />
         </Form.Item>
 
-        {tipoTarefa != "personalizado" && tipoTarefa !== "feedback-colaborador" && (
-          <Form.Item name="pbi" rules={[{ required: true, message: "Campo obrigatório" }]}>
-            {pbiOptions.length > 0 ? (
-              <SelectComponent name="PBI" options={pbiOptions} />
-            ) : (
-              <InputComponent name="PBI" type="number" nameForm={"pbi"} form={form} placeholder="Informe a PBI" />
-            )}
-          </Form.Item>
-        )}
-
-        {tipoTarefa === "feedback-colaborador" && (
-          <>
-            <Form.Item name="pbi" rules={[{ required: true, message: "Campo obrigatório" }]}>
+        {tipoTarefa != "personalizado" &&
+          tipoTarefa !== "feedback-colaborador" && (
+            <Form.Item
+              name="pbi"
+              rules={[{ required: true, message: "Campo obrigatório" }]}
+            >
               {pbiOptions.length > 0 ? (
                 <SelectComponent name="PBI" options={pbiOptions} />
               ) : (
-                <InputComponent name="PBI" type="number" nameForm={"pbi"} form={form} placeholder="Informe a PBI" />
+                <InputComponent
+                  name="PBI"
+                  type="number"
+                  nameForm={"pbi"}
+                  form={form}
+                  placeholder="Informe a PBI"
+                />
+              )}
+            </Form.Item>
+          )}
+
+        {tipoTarefa === "feedback-colaborador" && (
+          <>
+            <Form.Item
+              name="pbi"
+              rules={[{ required: true, message: "Campo obrigatório" }]}
+            >
+              {pbiOptions.length > 0 ? (
+                <SelectComponent name="PBI" options={pbiOptions} />
+              ) : (
+                <InputComponent
+                  name="PBI"
+                  type="number"
+                  nameForm={"pbi"}
+                  form={form}
+                  placeholder="Informe a PBI"
+                />
               )}
             </Form.Item>
             <Form.Item
@@ -740,11 +847,17 @@ export default function CadastrarTask() {
           </Form.Item>
         )}
 
-        <Form.Item name="time" rules={[{ required: true, message: "Campo obrigatório" }]}>
+        <Form.Item
+          name="time"
+          rules={[{ required: true, message: "Campo obrigatório" }]}
+        >
           <SelectComponent name="Time" options={times} />
         </Form.Item>
 
-        <Form.Item name="integrante" rules={[{ required: true, message: "Campo obrigatório" }]}>
+        <Form.Item
+          name="integrante"
+          rules={[{ required: true, message: "Campo obrigatório" }]}
+        >
           <SelectComponent name="Integrante" options={groupMembersOptions} />
         </Form.Item>
 
@@ -754,7 +867,9 @@ export default function CadastrarTask() {
             {
               required: true,
               validator: (_, value) =>
-                selectedDates.length > 0 ? Promise.resolve() : Promise.reject("Selecione pelo menos uma data."),
+                selectedDates.length > 0
+                  ? Promise.resolve()
+                  : Promise.reject("Selecione pelo menos uma data."),
             },
           ]}
         >
@@ -762,7 +877,12 @@ export default function CadastrarTask() {
         </Form.Item>
 
         <Form.Item className="col-span-3 flex justify-center">
-          <Button type="primary" htmlType="submit" loading={loading} className="w-[200px] bg-verde hover:!bg-verde-500">
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            className="w-[200px] bg-verde hover:!bg-verde-500"
+          >
             Criar Tarefa
           </Button>
         </Form.Item>
