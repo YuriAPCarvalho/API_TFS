@@ -181,8 +181,7 @@ export default function CadastrarTask() {
     const tipoTarefaValue = values.tipoTarefa || tipoTarefa;
 
     if (tipoTarefaValue === "personalizado") {
-      const file =
-        values.arquivo instanceof File ? values.arquivo : null;
+      const file = values.arquivo instanceof File ? values.arquivo : null;
       if (!file) {
         message.warning("Selecione um arquivo para tarefas personalizadas.");
         return;
@@ -464,7 +463,7 @@ export default function CadastrarTask() {
       } else {
         let excelTasks: any[] | null =
           fv.tipoTarefa === "personalizado"
-            ? fv.excelTasks ?? taskExcel
+            ? (fv.excelTasks ?? taskExcel)
             : null;
 
         if (fv.tipoTarefa === "personalizado" && !excelTasks?.length) {
@@ -499,25 +498,74 @@ export default function CadastrarTask() {
             excelTasks != null &&
             excelTasks.length > 0
           ) {
-            const areaPathValue =
-              fv.areaPathPBI || `${project}\\Área de Negócios`;
-            const iterationPathValue = `${fv.areaPathPBI || project}\\${fv.sprint}`;
+            const credentialsBody = [
+              {
+                op: "add",
+                path: "/fields/System.Credentials",
+                value: {
+                  usuario: values.usuario,
+                  senha: values.senha,
+                },
+              },
+            ];
 
             const results: Awaited<ReturnType<typeof fetchClient>>[] = [];
 
             for (const t of excelTasks) {
+              const pbiId = String(t.pbi ?? "").trim();
+              if (!pbiId) {
+                message.warning("Linha do arquivo sem PBI — task ignorada.");
+                continue;
+              }
+
+              let pbiAreaPath = "";
+              let iterationPathValue = "";
+
+              try {
+                const resp = await fetchClient(`/api/GetTask?pbi=${pbiId}`, {
+                  method: "POST",
+                  body: JSON.stringify(credentialsBody),
+                });
+
+                if (!resp?.success || !resp.data?.fields) {
+                  message.warning(
+                    `PBI ${pbiId} não encontrada — task ignorada.`,
+                  );
+                  continue;
+                }
+
+                pbiAreaPath = resp.data.fields["System.AreaPath"] ?? "";
+                const teamProject =
+                  resp.data.fields["System.TeamProject"] ?? project;
+
+                let pbiIterationPath = teamProject;
+                if (pbiAreaPath.includes("Área de Negócios")) {
+                  pbiIterationPath += "\\Área de Negócios";
+                }
+                pbiIterationPath += `\\${fv.sprint}`;
+                iterationPathValue = pbiIterationPath;
+              } catch {
+                message.warning(`Erro ao buscar PBI ${pbiId} — task ignorada.`);
+                continue;
+              }
+
+              if (!pbiAreaPath) {
+                message.warning(`PBI ${pbiId} sem Area Path — task ignorada.`);
+                continue;
+              }
+
               const title = (t.title ?? "")
                 .replace("{dd/MM/yyyy}", fullDate)
                 .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
                 .replace("{dd/MM}", formattedDate)
-                .replace("{pbi}", String(t.pbi ?? ""))
+                .replace("{pbi}", pbiId)
                 .replace("{sprint}", fv.sprint);
 
               const description = (t.description ?? "")
                 .replace("{dd/MM/yyyy}", fullDate)
                 .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
                 .replace("{dd/MM}", formattedDate)
-                .replace("{pbi}", String(t.pbi ?? ""))
+                .replace("{pbi}", pbiId)
                 .replace("{sprint}", fv.sprint);
 
               const bodyJson = JSON.stringify([
@@ -555,7 +603,7 @@ export default function CadastrarTask() {
                 {
                   op: "add",
                   path: "/fields/System.AreaPath",
-                  value: areaPathValue,
+                  value: pbiAreaPath,
                 },
                 {
                   op: "add",
@@ -604,6 +652,13 @@ export default function CadastrarTask() {
                 body: bodyJson,
               });
               results.push(response);
+            }
+
+            if (results.length === 0) {
+              message.warning(
+                "Nenhuma task foi criada. Verifique as PBIs no arquivo.",
+              );
+              continue;
             }
 
             const success = results.every((resp) => resp?.success);
@@ -992,12 +1047,17 @@ export default function CadastrarTask() {
           <SelectComponent name="Sprint" options={sprints} />
         </Form.Item>
 
-        <Form.Item
-          name="areaPathPBI"
-          rules={[{ required: true, message: "Campo obrigatório" }]}
-        >
-          <SelectComponent name="Área (Area Path)" options={areaPathOptions} />
-        </Form.Item>
+        {tipoTarefa !== "personalizado" && (
+          <Form.Item
+            name="areaPathPBI"
+            rules={[{ required: true, message: "Campo obrigatório" }]}
+          >
+            <SelectComponent
+              name="Área (Area Path)"
+              options={areaPathOptions}
+            />
+          </Form.Item>
+        )}
 
         {tipoTarefa != "personalizado" &&
           tipoTarefa !== "feedback-colaborador" && (
