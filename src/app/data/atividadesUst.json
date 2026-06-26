@@ -1,0 +1,706 @@
+[
+  {
+    "id": 2960,
+    "descricaoAtividade": "Alteração de protótipo - Alta Fidelidade"
+  },
+  {
+    "id": 2961,
+    "descricaoAtividade": "Alteração de protótipo - Baixa Fidelidade"
+  },
+  {
+    "id": 2965,
+    "descricaoAtividade": "Análise de problemas a partir de Métricas do Produto - Análise e identificação de causa-raíz de problemas encontrados a partir do monitoramento."
+  },
+  {
+    "id": 2891,
+    "descricaoAtividade": "Análise e implantação de Plugin em ferramenta de CMS"
+  },
+  {
+    "id": 2892,
+    "descricaoAtividade": "Aplicação de temas de ferramenta de CMS"
+  },
+  {
+    "id": 2899,
+    "descricaoAtividade": "Arquitetura da Informação - Organizar o conteúdo e a estrutura de um produto para facilitar a navegação"
+  },
+  {
+    "id": 3018,
+    "descricaoAtividade": "Atendimento especializado área de negócio e/ou área técnica"
+  },
+  {
+    "id": 2964,
+    "descricaoAtividade": "Atividade de avaliação de código (pull-requests) solicitada a partir do desenvolvimento de uma funcionalidade"
+  },
+  {
+    "id": 2948,
+    "descricaoAtividade": "Atividade de preparação, implantação e manutenção de ambientes (desenvolvimento ou teste ou homologação ou produção) - Fluxo automatizado de entrega ou compilação ou construção de executável ou instalação de softwares nos ambientes"
+  },
+  {
+    "id": 2963,
+    "descricaoAtividade": "Atualização de bibliotecas, plugins, frameworks ou ferramentas mantendo a aplicação a mais moderna possível"
+  },
+  {
+    "id": 3001,
+    "descricaoAtividade": "Atualização do Documento de Análise Incial - DAI"
+  },
+  {
+    "id": 2999,
+    "descricaoAtividade": "Atualização do Documento de Visão do Projeto - DVI"
+  },
+  {
+    "id": 3042,
+    "descricaoAtividade": "Atualizar processos automatizados de teste"
+  },
+  {
+    "id": 3017,
+    "descricaoAtividade": "Avaliação de uma nova tecnologia"
+  },
+  {
+    "id": 2880,
+    "descricaoAtividade": "BI - Atendimento especializado em painéis e ferramentas de BI"
+  },
+  {
+    "id": 2883,
+    "descricaoAtividade": "BI - Criação de conexão a fonte de dados"
+  },
+  {
+    "id": 2881,
+    "descricaoAtividade": "BI - Elaboração de painéis em ferramentas BI"
+  },
+  {
+    "id": 2884,
+    "descricaoAtividade": "BI - Extração utilizando ferramenta de BI"
+  },
+  {
+    "id": 2882,
+    "descricaoAtividade": "BI - Suporte e manutenção de painéis em ferramentas de BI"
+  },
+  {
+    "id": 2885,
+    "descricaoAtividade": "BI - Transformação utilizando ferramenta de BI - Processo de transformação dos dados que são extraídos para melhor visualização dentro do painel"
+  },
+  {
+    "id": 3019,
+    "descricaoAtividade": "Capacitação interna de um colaborador para uso de uma tecnologia/metodologia por hora - A capacitação deve ter sido demandada pelo órgão."
+  },
+  {
+    "id": 3030,
+    "descricaoAtividade": "Cerimônias/Reuniões - Reunião acima de 2h até 4h por dia."
+  },
+  {
+    "id": 3031,
+    "descricaoAtividade": "Cerimônias/Reuniões - Reunião acima de 4h até 8h por dia."
+  },
+  {
+    "id": 3029,
+    "descricaoAtividade": "Cerimônias/Reuniões - Reunião até 2h por dia."
+  },
+  {
+    "id": 3032,
+    "descricaoAtividade": "Cerimônias/Reuniões - Reunião de Planejamento de Sprint"
+  },
+  {
+    "id": 3033,
+    "descricaoAtividade": "Cerimônias/Reuniões - Reunião de Retrospectiva de Sprint"
+  },
+  {
+    "id": 3034,
+    "descricaoAtividade": "Cerimônias/Reuniões - Reunião de Revisão de Sprint"
+  },
+  {
+    "id": 3035,
+    "descricaoAtividade": "Cerimônias/Reuniões - Reunião Diária"
+  },
+  {
+    "id": 2887,
+    "descricaoAtividade": "Comunicação - Implementação e aplicação de pesquisa de satisfação"
+  },
+  {
+    "id": 2886,
+    "descricaoAtividade": "Comunicação - Publicação de Posts em redes sociais do Governo"
+  },
+  {
+    "id": 2903,
+    "descricaoAtividade": "Construção de Modelos Preditivos (p/ modelo)"
+  },
+  {
+    "id": 2904,
+    "descricaoAtividade": "Criação de algoritmo de aprendizado de máquina (Machine Learning)"
+  },
+  {
+    "id": 2905,
+    "descricaoAtividade": "Criação de algoritmos de inteligência artificial e aplicação sobre dados."
+  },
+  {
+    "id": 2906,
+    "descricaoAtividade": "Criação de algoritmos para analisar a frequência de n-gramas em dados textuais"
+  },
+  {
+    "id": 2907,
+    "descricaoAtividade": "Criação de consulta especializada para busca de dados em ambiente de big data"
+  },
+  {
+    "id": 2908,
+    "descricaoAtividade": "Criação de consultas para filtrar dados textuais em ambiente de big data"
+  },
+  {
+    "id": 2991,
+    "descricaoAtividade": "Criação de Cronograma para execução de projetos"
+  },
+  {
+    "id": 2888,
+    "descricaoAtividade": "Criação de estrutura de página em ferramenta de CMS"
+  },
+  {
+    "id": 2909,
+    "descricaoAtividade": "Criação de expressões regulares para tratamento de dados textuais"
+  },
+  {
+    "id": 2910,
+    "descricaoAtividade": "Criação de fluxo automatizado de preparação e carga de dados em ambiente de big data por fluxo"
+  },
+  {
+    "id": 2911,
+    "descricaoAtividade": "Criação de nuvens de palavras dos dados"
+  },
+  {
+    "id": 2889,
+    "descricaoAtividade": "Criação de página dentro de ferramenta de CMS"
+  },
+  {
+    "id": 2951,
+    "descricaoAtividade": "Criação de protótipo - Alta Fidelidade"
+  },
+  {
+    "id": 2952,
+    "descricaoAtividade": "Criação de protótipo - Baixa Fidelidade"
+  },
+  {
+    "id": 3037,
+    "descricaoAtividade": "Criação de relatório gerado em formato pdf, csv, txt e outros - Manutenção"
+  },
+  {
+    "id": 3036,
+    "descricaoAtividade": "Criação de relatório gerado em formato pdf, csv, txt e outros - Novo"
+  },
+  {
+    "id": 2950,
+    "descricaoAtividade": "Criação de relatório, listagem ou gráficos de itens e sua paginação compreendendo backend, frontend e acesso aos dados do relatório - Manutenção"
+  },
+  {
+    "id": 2949,
+    "descricaoAtividade": "Criação de relatório, listagem ou gráficos de itens e sua paginação compreendendo backend, frontend e acesso aos dados do relatório - Novo"
+  },
+  {
+    "id": 2912,
+    "descricaoAtividade": "Criação de rotina automatizada para tratamento de dados em ambiente de big data"
+  },
+  {
+    "id": 2913,
+    "descricaoAtividade": "Criação de tabelas em banco de dados"
+  },
+  {
+    "id": 3000,
+    "descricaoAtividade": "Criação do Documento de Análise Incial - DAI"
+  },
+  {
+    "id": 2998,
+    "descricaoAtividade": "Criação do Documento de Visão do Projeto - DVI"
+  },
+  {
+    "id": 2900,
+    "descricaoAtividade": "Criar mapas de sites, fluxos ou jornada de usuário e diagramas de navegação."
+  },
+  {
+    "id": 2902,
+    "descricaoAtividade": "Criar microinterações, animações e transições."
+  },
+  {
+    "id": 2890,
+    "descricaoAtividade": "Criar plugin para deploy em ferramenta de CMS e uso nas páginas definidas"
+  },
+  {
+    "id": 2901,
+    "descricaoAtividade": "Definir como os elementos interativos responderão às ações dos usuários."
+  },
+  {
+    "id": 2953,
+    "descricaoAtividade": "Desenvolvimento de uma funcionalidade de sistema compreendendo codificação - Manutenção"
+  },
+  {
+    "id": 2954,
+    "descricaoAtividade": "Desenvolvimento de uma funcionalidade de sistema compreendendo codificação - Novo"
+  },
+  {
+    "id": 2968,
+    "descricaoAtividade": "Documentação - Documento de revisão da Iteração (sprint) demonstrando tudo que foi alcançado durante a Interação em termos técnico e de negócio."
+  },
+  {
+    "id": 2969,
+    "descricaoAtividade": "Documentação - Elaboração de documentação de ação de projetos - Apresentações de projetos, atas de reuniões ou outros"
+  },
+  {
+    "id": 2970,
+    "descricaoAtividade": "Documentação - Elaboração de documento de retrospectiva"
+  },
+  {
+    "id": 2971,
+    "descricaoAtividade": "Documentação - Manual do usuário - Criação de manuais de uso da solução de TIC por macroprocesso, processos e subprocessos de negócio com as regras e procedimentos"
+  },
+  {
+    "id": 2972,
+    "descricaoAtividade": "Documentação - Manual do usuário - Manutenção de manuais de uso da solução de TIC por macroprocesso, processos e subprocessos de negócio com as regras e procedimentos"
+  },
+  {
+    "id": 2966,
+    "descricaoAtividade": "Documento de arquitetura de software e infraestrutura ou parecer técnico arquitetural - Manutenção"
+  },
+  {
+    "id": 2967,
+    "descricaoAtividade": "Documento de arquitetura de software e infraestrutura ou parecer técnico arquitetural - Novo"
+  },
+  {
+    "id": 2955,
+    "descricaoAtividade": "Elaboração de documentação de uma API/Web Service disponibilizada para integrações"
+  },
+  {
+    "id": 2956,
+    "descricaoAtividade": "Elaboração de tela web - criação"
+  },
+  {
+    "id": 2947,
+    "descricaoAtividade": "Elaboração de tela web - manutenção"
+  },
+  {
+    "id": 2992,
+    "descricaoAtividade": "Elaboração e atualização do backlog da Iteração (Planejamento da Sprint)."
+  },
+  {
+    "id": 2993,
+    "descricaoAtividade": "Elaboração e atualização do backlog do produto ou demandas"
+  },
+  {
+    "id": 2915,
+    "descricaoAtividade": "Elaboração e execução de query para geração de relatórios em formato de arquivo"
+  },
+  {
+    "id": 2916,
+    "descricaoAtividade": "Elaboração e execução de tarefas correlatas a tunning de queries, objetos e serviços de banco de dados"
+  },
+  {
+    "id": 2941,
+    "descricaoAtividade": "Elaboração e manutenção de ETL/Fato/dimensão/afins"
+  },
+  {
+    "id": 2995,
+    "descricaoAtividade": "Elaborar Diagrama do Projeto (macroprocessos, processos e subprocessos de negócios)"
+  },
+  {
+    "id": 2996,
+    "descricaoAtividade": "Elicitar requisitos técnicos funcionais e não funcionais a nível de produto (Item de produto)"
+  },
+  {
+    "id": 3044,
+    "descricaoAtividade": "Especificação de teste - Criação de critérios de aceitação e/ou cenários de teste."
+  },
+  {
+    "id": 3002,
+    "descricaoAtividade": "Especificar funcionalidade (Tarefa/Épico)"
+  },
+  {
+    "id": 2945,
+    "descricaoAtividade": "Especificar o dicionário de dados por entidade"
+  },
+  {
+    "id": 2914,
+    "descricaoAtividade": "Execução de atividades de Administração de Dados, com suporte de ferramenta automatizada"
+  },
+  {
+    "id": 2919,
+    "descricaoAtividade": "Execução de restore de ambiente de armazenamento ou de processamento de dados"
+  },
+  {
+    "id": 2917,
+    "descricaoAtividade": "Execução de tarefas de monitoramento dos serviços dos SGBDs"
+  },
+  {
+    "id": 2918,
+    "descricaoAtividade": "Execução, implementação de planos e rotinas de backups dos dados e metadados dos SGBDs"
+  },
+  {
+    "id": 2920,
+    "descricaoAtividade": "Execução, implementação e investigação de auditoria em logs"
+  },
+  {
+    "id": 2921,
+    "descricaoAtividade": "Execução, implementação e manutenção das bases OLAP"
+  },
+  {
+    "id": 2922,
+    "descricaoAtividade": "Execução, implementação e manutenção dos serviços de Data Warehouse"
+  },
+  {
+    "id": 2987,
+    "descricaoAtividade": "Feedback por colaborador"
+  },
+  {
+    "id": 2983,
+    "descricaoAtividade": "Geoprocessamento - Capacitar o usuário no que se refere aos procedimentos de uso e aplicações do Geoprocessamento - A capacitação deve ter sido demandada pelo órgão. Até 2h por dia."
+  },
+  {
+    "id": 2984,
+    "descricaoAtividade": "Geoprocessamento - Capacitar o usuário no que se refere aos procedimentos de uso e aplicações do Geoprocessamento - A capacitação deve ter sido demandada pelo órgão. Acima de 2h até 4h por dia."
+  },
+  {
+    "id": 2985,
+    "descricaoAtividade": "Geoprocessamento - Capacitar o usuário no que se refere aos procedimentos de uso e aplicações do Geoprocessamento - A capacitação deve ter sido demandada pelo órgão. Acima de 4h até 8h por dia."
+  },
+  {
+    "id": 2974,
+    "descricaoAtividade": "Geoprocessamento - Desenvolvimento de processo automatizado para importação de Dados Geográficos"
+  },
+  {
+    "id": 2977,
+    "descricaoAtividade": "Geoprocessamento - Desenvolvimento de WebMap, WebApps, Camadas e Itens"
+  },
+  {
+    "id": 2982,
+    "descricaoAtividade": "Geoprocessamento - Elaborar e executar testes exploratórios, atendendo os requisitos de negócio e técnicos"
+  },
+  {
+    "id": 2981,
+    "descricaoAtividade": "Geoprocessamento - Elaborar e executar testes funcionais e não funcionais atendendo os requisitos de negócio e técnicos"
+  },
+  {
+    "id": 2973,
+    "descricaoAtividade": "Geoprocessamento - Execução de atividades de Administração e manipulação de Dados Geográficos (vetoriais/raster)"
+  },
+  {
+    "id": 2980,
+    "descricaoAtividade": "Geoprocessamento - Execução, implementação e manutenção em Integrações Sistêmicas"
+  },
+  {
+    "id": 2979,
+    "descricaoAtividade": "Geoprocessamento - Gerenciamento de Conteúdo, Grupos e Usuários"
+  },
+  {
+    "id": 2986,
+    "descricaoAtividade": "Geoprocessamento - Orientar o usuário no que se refere aos procedimentos de uso e aplicações do Geoprocessamento"
+  },
+  {
+    "id": 2976,
+    "descricaoAtividade": "Geoprocessamento - Publicação de Dados Geográficos"
+  },
+  {
+    "id": 2975,
+    "descricaoAtividade": "Geoprocessamento - Suporte e manutenção em processo automatizado para importação de Dados Geográficos"
+  },
+  {
+    "id": 2978,
+    "descricaoAtividade": "Geoprocessamento - Suporte e manutenção em WebMap, WebApps, Camadas e Itens"
+  },
+  {
+    "id": 2893,
+    "descricaoAtividade": "Gerenciador de Conteúdos em ferramenta de CMS"
+  },
+  {
+    "id": 2944,
+    "descricaoAtividade": "Higienização de dados como remoção de caracteres (tokens) especiais, conversão para minúsculas, entre outras"
+  },
+  {
+    "id": 3016,
+    "descricaoAtividade": "Homologação de novas ferramentas para uso em projetos"
+  },
+  {
+    "id": 2946,
+    "descricaoAtividade": "Implantar práticas e padrões de acessibilidade no software."
+  },
+  {
+    "id": 2923,
+    "descricaoAtividade": "Implementação e implantação de algoritmos de classificação"
+  },
+  {
+    "id": 2924,
+    "descricaoAtividade": "Implementação e manutenção de planos de segurança da informação para os SGBDs"
+  },
+  {
+    "id": 3055,
+    "descricaoAtividade": "Implementar processos automatizados de teste"
+  },
+  {
+    "id": 2925,
+    "descricaoAtividade": "Importar e exportar base de dados - Geração de massa de dados para testes"
+  },
+  {
+    "id": 3013,
+    "descricaoAtividade": "Infraestrutura - Atualização de software/firmware de máquinas servidoras ou dispositivos de rede"
+  },
+  {
+    "id": 3014,
+    "descricaoAtividade": "Infraestrutura - Correção de falhas de segurança da informação, em dispositivos de rede, servidores ou ambiente"
+  },
+  {
+    "id": 3003,
+    "descricaoAtividade": "Infraestrutura - Criação do fluxo automatizado de entrega, compilação, construção de executável e publicação de componentes da solução de TIC"
+  },
+  {
+    "id": 3010,
+    "descricaoAtividade": "Infraestrutura - Execução, implementação de planos e rotinas de backups ou restore de ambiente de armazenamento ou de processamento de dados"
+  },
+  {
+    "id": 3004,
+    "descricaoAtividade": "Infraestrutura - Inclusão, remoção ou manutenção nos servidores ou hosts dos sistemas de monitoramento e inventário"
+  },
+  {
+    "id": 3008,
+    "descricaoAtividade": "Infraestrutura - Manutenção de ambiente de aplicações ou de integração"
+  },
+  {
+    "id": 3009,
+    "descricaoAtividade": "Infraestrutura - Manutenção de ambiente de armazenamento ou de processamento de dados"
+  },
+  {
+    "id": 3005,
+    "descricaoAtividade": "Infraestrutura - Manutenção ou atualização dos servidores, políticas ou tarefas dos servidores de antivírus"
+  },
+  {
+    "id": 3012,
+    "descricaoAtividade": "Infraestrutura - Serviço de instalação, configuração ou manutenção de equipamentos e de ambiente de segurança da informaçào (VPN, Firewall e outros)"
+  },
+  {
+    "id": 3011,
+    "descricaoAtividade": "Infraestrutura - Serviço para instalação, configuração ou manutenção de máquinas servidoras ou dispositivos de rede ou de comunicação"
+  },
+  {
+    "id": 3006,
+    "descricaoAtividade": "Infraestrutura - Suporte em ferramenta ECM/BPM ou equivalentes"
+  },
+  {
+    "id": 3007,
+    "descricaoAtividade": "Infraestrutura - Sustentação dos certificados digitais de websites governamentais - A demanda deve ser solicitada pelo órgão para a empresa"
+  },
+  {
+    "id": 2957,
+    "descricaoAtividade": "Integração com sistemas externos - manutenção - Integralções via APIs, Web Services, Banco de Dados ou outros"
+  },
+  {
+    "id": 2958,
+    "descricaoAtividade": "Integração com sistemas externos - novo - Integralções via APIs, Web Services, Banco de Dados ou outros"
+  },
+  {
+    "id": 2988,
+    "descricaoAtividade": "Liderança - Criação de Relatório de Situação do projeto"
+  },
+  {
+    "id": 2926,
+    "descricaoAtividade": "Manutenção de algoritmo de aprendizado de máquina (Machine Learning)"
+  },
+  {
+    "id": 2927,
+    "descricaoAtividade": "Manutenção de algoritmos de classificação"
+  },
+  {
+    "id": 2928,
+    "descricaoAtividade": "Manutenção de algoritmos de inteligência artificial e aplicação sobre dados."
+  },
+  {
+    "id": 2929,
+    "descricaoAtividade": "Manutenção de algoritmos para analisar a frequência de n-gramas em dados textuais"
+  },
+  {
+    "id": 2930,
+    "descricaoAtividade": "Manutenção de ambiente de armazenamento ou de processamento de dados"
+  },
+  {
+    "id": 2931,
+    "descricaoAtividade": "Manutenção de consulta especializada para busca de dados em ambiente de big data"
+  },
+  {
+    "id": 2932,
+    "descricaoAtividade": "Manutenção de consultas para filtrar dados textuais em ambiente de big data"
+  },
+  {
+    "id": 2933,
+    "descricaoAtividade": "Manutenção de expressões regulares para tratamento de dados textuais em ambiente de big data"
+  },
+  {
+    "id": 2934,
+    "descricaoAtividade": "Manutenção de fluxo automatizado de preparação e carga de dados em ambiente de big data por fluxo"
+  },
+  {
+    "id": 2894,
+    "descricaoAtividade": "Manutenção de página existente em ferramenta de CMS"
+  },
+  {
+    "id": 2935,
+    "descricaoAtividade": "Manutenção de rotina automatizada para tratamento de dados em ambiente de big data"
+  },
+  {
+    "id": 3021,
+    "descricaoAtividade": "Ministrar capacitações, treinamentos, palestras e outros eventos de interesse da Instituição - A capacitação deve ter sido demandada pelo órgão. Até 2h por dia."
+  },
+  {
+    "id": 3022,
+    "descricaoAtividade": "Ministrar capacitações, treinamentos, palestras e outros eventos de interesse da Instituição - A capacitação deve ter sido demandada pelo órgão. Acima de 2h até 4h por dia."
+  },
+  {
+    "id": 3023,
+    "descricaoAtividade": "Ministrar capacitações, treinamentos, palestras e outros eventos de interesse da Instituição - A capacitação deve ter sido demandada pelo órgão. Acima de 4h até 8h por dia."
+  },
+  {
+    "id": 2937,
+    "descricaoAtividade": "Modelagem das bases OLAP"
+  },
+  {
+    "id": 2938,
+    "descricaoAtividade": "Modelagem dos serviços de Data Warehouse"
+  },
+  {
+    "id": 2939,
+    "descricaoAtividade": "Modelo Relacional - Elaborar ou manter modelo de dados como execução de scripts. Exemplo: Migration."
+  },
+  {
+    "id": 2940,
+    "descricaoAtividade": "Modelo Relacional - Elaborar ou manter stored procedures, triggers, functions e views"
+  },
+  {
+    "id": 2989,
+    "descricaoAtividade": "Monitoramento diário por aplicações ou serviços"
+  },
+  {
+    "id": 2990,
+    "descricaoAtividade": "Monitoramento diário por demandas ou projetos"
+  },
+  {
+    "id": 2959,
+    "descricaoAtividade": "Orientação/Acompanhamento de programação de uma funcionalidade ou tela. (Programação em par)"
+  },
+  {
+    "id": 3024,
+    "descricaoAtividade": "Participação de capacitações, treinamentos, palestras e outros eventos externos de interesse da Instituição - A capacitação deve ter sido demandada pelo órgão. Até 2h por dia."
+  },
+  {
+    "id": 3025,
+    "descricaoAtividade": "Participação de capacitações, treinamentos, palestras e outros eventos externos de interesse da Instituição - A capacitação deve ter sido demandada pelo órgão. Acima de 2h até 4h por dia."
+  },
+  {
+    "id": 3026,
+    "descricaoAtividade": "Participação de capacitações, treinamentos, palestras e outros eventos externos de interesse da Instituição - A capacitação deve ter sido demandada pelo órgão. Acima de 4h até 8h por dia."
+  },
+  {
+    "id": 3027,
+    "descricaoAtividade": "Pesquisa - Pesquisa de ferramentas tecnológicas para uso em projetos ou aquisição"
+  },
+  {
+    "id": 3028,
+    "descricaoAtividade": "Pesquisa - Pesquisa de Normas por assunto (Leis, Decretos, Resoluções, Portarias e afins), e/ou publicações em Diário Oficial, Matérias Jornalisticas, Notícias Oficiais, para compor um documento de requisitos"
+  },
+  {
+    "id": 2895,
+    "descricaoAtividade": "Plotagem - Plotagem de arquivos de impressão"
+  },
+  {
+    "id": 3020,
+    "descricaoAtividade": "Preparação de material didático para capacitações, treinamentos, palestras e outros eventos de interesse da instituição - A capacitação deve ter sido demandada pelo órgão."
+  },
+  {
+    "id": 3045,
+    "descricaoAtividade": "Preparar dados de teste - Elaboração e preparação de dados de teste contemplando geração automática de dados de testes"
+  },
+  {
+    "id": 2994,
+    "descricaoAtividade": "Priorização das solicitações de negócio"
+  },
+  {
+    "id": 2962,
+    "descricaoAtividade": "Publicação - Serviço de manutenção das branches para publicação do código fonte em ambiente de homologação e produção"
+  },
+  {
+    "id": 2936,
+    "descricaoAtividade": "Realizar a construção do modelo de dados conceitual tendo por objetivo identificar o correto conceito do requisito e sua modelagem conceitual e seu relacionamento com outras entidades de negócio."
+  },
+  {
+    "id": 2898,
+    "descricaoAtividade": "Realizar entrevistas, questionários e observações para coletar insights."
+  },
+  {
+    "id": 3015,
+    "descricaoAtividade": "Realizar prova de conceito de novas tecnologias"
+  },
+  {
+    "id": 2997,
+    "descricaoAtividade": "Registro de Solicitações"
+  },
+  {
+    "id": 3043,
+    "descricaoAtividade": "Relatório de não conformidade - Elaboração de relatório de não conformidade contendo testes realizados com suas respectivas evidências que demonstram as não conformidades relatadas."
+  },
+  {
+    "id": 2942,
+    "descricaoAtividade": "Rotulagem automatizada de dados textuais com base em n-gramas"
+  },
+  {
+    "id": 2943,
+    "descricaoAtividade": "Rotulagem manual de dados textuais"
+  },
+  {
+    "id": 3039,
+    "descricaoAtividade": "Suporte - Execução de rotina de liberação de acesso"
+  },
+  {
+    "id": 3038,
+    "descricaoAtividade": "Suporte - Resposta à dúvida oriunda de suporte técnico"
+  },
+  {
+    "id": 3054,
+    "descricaoAtividade": "Teste automatizado - Criação de programas que executam testes em softwares que estão em construção de uma forma padronizada, sem ser necessário a intervenção humana."
+  },
+  {
+    "id": 3046,
+    "descricaoAtividade": "Teste de aceitação - Tem por objetivo execução dos critérios de aceite ou dos testes especificados"
+  },
+  {
+    "id": 3041,
+    "descricaoAtividade": "Teste de Acessibilidade - Garantir que o produto seja utilizável por pessoas com diferentes habilidades e necessidades."
+  },
+  {
+    "id": 3047,
+    "descricaoAtividade": "Teste de carga - Tem por objetivo verifica o funcionamento da aplicação com a utilização grandes quantidades de acessos simultâneos"
+  },
+  {
+    "id": 3048,
+    "descricaoAtividade": "Teste de desempenho - Teste dos requisitos não funcionais relacionados ao desempenho do software, como, por exemplo, requisitos associados a tempo de resposta, volume de dados, quantidade de acessos por unidade de tempo. Apresentação de relatório ao final"
+  },
+  {
+    "id": 3049,
+    "descricaoAtividade": "Teste de regressão - Execução do Re-teste de todo o sistema toda vez que algo foi mudado e corrigindo inconsistências. Por iteração"
+  },
+  {
+    "id": 3050,
+    "descricaoAtividade": "Teste de segurança - Tem por objetivo listar as diversas condições de teste dos requisitos não funcionais relacionados à segurança do software. Apresentação de relatório ao final"
+  },
+  {
+    "id": 3051,
+    "descricaoAtividade": "Teste de unidade - Em nível de componente ou classe"
+  },
+  {
+    "id": 3052,
+    "descricaoAtividade": "Teste Exploratório - Teste exploratório é uma abordagem de testes que enfatiza as habilidades do testador em tomar decisões sobre o que será testado durante a execução do teste ao invés de seguir um roteiro previamente planejado."
+  },
+  {
+    "id": 3053,
+    "descricaoAtividade": "Teste funcional - Tem por objetivo avaliar se o sistema funciona adequadamente, obtendo os resultados esperados de acordo com determinados conjuntos de dados de entradas que visam a testar determinados casos de uso. Engloba também o planejamento do mesmo"
+  },
+  {
+    "id": 3040,
+    "descricaoAtividade": "Testes de Usabilidade - Avaliar como os usuários interagem com o produto em cenários do mundo real ou identificar problemas de usabilidade e propor melhorias"
+  },
+  {
+    "id": 2896,
+    "descricaoAtividade": "Web design - Criação de identidade visual, Front-end com funcionalides definidas para sites"
+  },
+  {
+    "id": 2897,
+    "descricaoAtividade": "Web design - Criação de logomarcas, Apresentações e campanhas visuais"
+  }
+]

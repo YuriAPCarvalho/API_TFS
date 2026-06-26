@@ -7,6 +7,8 @@ import InputComponent from "../Input/Input";
 import DateSelectorComponent from "../DateSelector/DateSelector";
 import InputFileComponent from "../InputFile/InputFile";
 import ModalLoginGSI from "../ModalLoginGSI/ModalLoginGSI";
+import ReservedWordsHelp from "./ReservedWordsHelp";
+import AtividadesUstHelp from "./AtividadesUstHelp";
 import fetchClient from "@/app/utils/routesHelper/fetchClient";
 import { contrato, project } from "@/app/config";
 import { processExcelFile } from "@/app/utils/processExcelFile";
@@ -16,6 +18,8 @@ import { tipoTarefas } from "@/app/enums/tipoTarefas";
 import { times } from "@/app/enums/times";
 import { areaPath } from "@/app/enums/areaPath";
 import { decryptPassword } from "@/app/utils/encryption";
+import { replaceReservedWords, getPbiCriterioAceite } from "@/app/utils/replaceReservedWords";
+import { fetchSprintReservedWords } from "@/app/utils/fetchSprintReservedWords";
 
 export default function CadastrarTask() {
   const [form] = Form.useForm();
@@ -520,6 +524,7 @@ export default function CadastrarTask() {
 
               let pbiAreaPath = "";
               let iterationPathValue = "";
+              let pbiFields: Record<string, unknown> | undefined;
 
               try {
                 const resp = await fetchClient(`/api/GetTask?pbi=${pbiId}`, {
@@ -534,6 +539,7 @@ export default function CadastrarTask() {
                   continue;
                 }
 
+                pbiFields = resp.data.fields;
                 pbiAreaPath = resp.data.fields["System.AreaPath"] ?? "";
                 const teamProject =
                   resp.data.fields["System.TeamProject"] ?? project;
@@ -554,19 +560,34 @@ export default function CadastrarTask() {
                 continue;
               }
 
-              const title = (t.title ?? "")
-                .replace("{dd/MM/yyyy}", fullDate)
-                .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
-                .replace("{dd/MM}", formattedDate)
-                .replace("{pbi}", pbiId)
-                .replace("{sprint}", fv.sprint);
+              const sprintReservedWords = await fetchSprintReservedWords(
+                values.usuario,
+                values.senha,
+                iterationPathValue,
+              );
+              const pbiCriterioAceite = getPbiCriterioAceite(pbiFields);
+              const pbiDescricao = String(pbiFields?.["System.Description"] ?? "");
+              const pbiTitulo = String(pbiFields?.["System.Title"] ?? "");
 
-              const description = (t.description ?? "")
-                .replace("{dd/MM/yyyy}", fullDate)
-                .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
-                .replace("{dd/MM}", formattedDate)
-                .replace("{pbi}", pbiId)
-                .replace("{sprint}", fv.sprint);
+              const reservedWordsContext = {
+                formattedDate,
+                fullDate,
+                previousDay,
+                pbi: pbiId,
+                pbiTitulo,
+                pbiDescricao,
+                pbiCriterioAceite,
+                colaborador: fv.integrante,
+                sprint: fv.sprint,
+                ...sprintReservedWords,
+              };
+
+              const title = replaceReservedWords(t.title, reservedWordsContext);
+
+              const description = replaceReservedWords(
+                t.description,
+                reservedWordsContext,
+              );
 
               const bodyJson = JSON.stringify([
                 {
@@ -683,8 +704,10 @@ export default function CadastrarTask() {
               const base = taskTemplates[fv.tipoTarefa]()[0];
               tasks = colaboradores.map((colab: string) => ({
                 ...base,
-                title: base.title.replace(/{colaborador}/g, colab),
-                description: base.description.replace(/{colaborador}/g, colab),
+                title: replaceReservedWords(base.title, { colaborador: colab }),
+                description: replaceReservedWords(base.description, {
+                  colaborador: colab,
+                }),
               }));
             } else {
               const taskTemplateResult = taskTemplates[fv.tipoTarefa]();
@@ -851,26 +874,42 @@ export default function CadastrarTask() {
             const pbiTitulo = selectedWorkItem?.fields?.["System.Title"] ?? "";
             const pbiDescricao =
               selectedWorkItem?.fields?.["System.Description"] ?? "";
+            const pbiCriterioAceite = getPbiCriterioAceite(
+              selectedWorkItem?.fields,
+            );
             const pbisRelacionadas = (fv.pbisRelacionadas ?? "").trim();
+            const sprintReservedWords = fv.sprint
+              ? await fetchSprintReservedWords(
+                  values.usuario,
+                  values.senha,
+                  `${project}\\Área de Negócios\\${fv.sprint}`,
+                )
+              : {};
 
             for (const t of tasks) {
               const taskData = {
                 ...t,
-                title: t.title
-                  .replace("{dd/MM/yyyy}", fullDate)
-                  .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
-                  .replace("{dd/MM}", formattedDate)
-                  .replace("{pbi}", fv.pbi)
-                  .replace("{pbi.titulo}", pbiTitulo)
-                  .replace("{sprint}", fv.sprint),
-                description: t.description
-                  .replace("{dd/MM/yyyy}", fullDate)
-                  .replace(/\{dda\/MMa\}/g, `(${previousDay})`)
-                  .replace("{dd/MM}", formattedDate)
-                  .replace("{pbi}", fv.pbi)
-                  .replace("{pbi.descricao}", pbiDescricao)
-                  .replace("{pbi.relacionadas}", pbisRelacionadas)
-                  .replace("{sprint}", fv.sprint),
+                title: replaceReservedWords(t.title, {
+                  formattedDate,
+                  fullDate,
+                  previousDay,
+                  pbi: fv.pbi,
+                  pbiTitulo,
+                  sprint: fv.sprint,
+                  pbiCriterioAceite,
+                  ...sprintReservedWords,
+                }),
+                description: replaceReservedWords(t.description, {
+                  formattedDate,
+                  fullDate,
+                  previousDay,
+                  pbi: fv.pbi,
+                  pbiDescricao,
+                  pbisRelacionadas,
+                  sprint: fv.sprint,
+                  pbiCriterioAceite,
+                  ...sprintReservedWords,
+                }),
               };
 
               const bodyJson = JSON.stringify([
@@ -1033,12 +1072,17 @@ export default function CadastrarTask() {
         onFinish={handleSubmit}
         className="grid grid-cols-3 gap-4"
       >
-        <Form.Item
-          name="tipoTarefa"
-          rules={[{ required: true, message: "Campo obrigatório" }]}
-        >
-          <SelectComponent name="Tipo de Tarefa" options={tipoTarefas} />
-        </Form.Item>
+        <div className="flex items-start gap-2">
+          <Form.Item
+            name="tipoTarefa"
+            rules={[{ required: true, message: "Campo obrigatório" }]}
+            className="!mb-0"
+          >
+            <SelectComponent name="Tipo de Tarefa" options={tipoTarefas} />
+          </Form.Item>
+          <ReservedWordsHelp visible={tipoTarefa === "personalizado"} />
+          <AtividadesUstHelp visible={tipoTarefa === "personalizado"} />
+        </div>
 
         <Form.Item
           name="sprint"
