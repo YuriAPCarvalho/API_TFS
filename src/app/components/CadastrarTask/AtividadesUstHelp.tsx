@@ -10,6 +10,13 @@ interface AtividadesUstHelpProps {
   visible: boolean;
 }
 
+const complexidadeOrder: Record<string, number> = {
+  Simples: 1,
+  Média: 2,
+  Complexa: 3,
+  Única: 4,
+};
+
 const columns: ColumnsType<AtividadeUst> = [
   {
     title: "ID",
@@ -24,6 +31,15 @@ const columns: ColumnsType<AtividadeUst> = [
     key: "descricaoAtividade",
     sorter: (a, b) =>
       a.descricaoAtividade.localeCompare(b.descricaoAtividade, "pt-BR"),
+  },
+  {
+    title: "Complexidade",
+    dataIndex: "complexidade",
+    key: "complexidade",
+    width: 130,
+    sorter: (a, b) =>
+      (complexidadeOrder[a.complexidade] ?? 99) -
+      (complexidadeOrder[b.complexidade] ?? 99),
   },
 ];
 
@@ -45,7 +61,8 @@ export default function AtividadesUstHelp({ visible }: AtividadesUstHelpProps) {
     return atividadesUst.filter(
       (atividade) =>
         String(atividade.id).includes(term) ||
-        atividade.descricaoAtividade.toLowerCase().includes(term),
+        atividade.descricaoAtividade.toLowerCase().includes(term) ||
+        atividade.complexidade.toLowerCase().includes(term),
     );
   }, [search]);
 
@@ -73,13 +90,14 @@ export default function AtividadesUstHelp({ visible }: AtividadesUstHelpProps) {
         destroyOnClose
       >
         <p className="mb-3 text-sm text-gray-600">
-          Use o <strong>ID</strong> na coluna <strong>activityId</strong> e a{" "}
-          <strong>descrição</strong> na coluna <strong>activity</strong> do
+          Use o <strong>ID</strong> na coluna <strong>activityId</strong>, a{" "}
+          <strong>descrição</strong> na coluna <strong>activity</strong> e a{" "}
+          <strong>complexidade</strong> na coluna <strong>complexity</strong> do
           Excel.
         </p>
 
         <Input.Search
-          placeholder="Buscar por ID ou descrição"
+          placeholder="Buscar por ID, descrição ou complexidade"
           allowClear
           value={search}
           onChange={(event) => setSearch(event.target.value)}
