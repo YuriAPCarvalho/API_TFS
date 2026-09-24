@@ -1,50 +1,78 @@
-import { GetServerSidePropsContext, PreviewData } from 'next';
-import { ParsedUrlQuery } from 'querystring';
-import { getAuthHeaders } from '../getAuthHeaders';
-import { message } from 'antd';
+import { GetServerSidePropsContext, PreviewData } from "next";
+import { ParsedUrlQuery } from "querystring";
+import { getAuthHeaders } from "../getAuthHeaders";
+import { toast } from "react-toastify";
 
-export default async function fetchClient(input: RequestInfo | URL, init?: RequestInit, rotaProtegida = true, serverSide: boolean = false,
-    contextServerSide?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>): Promise<any> {
-    return new Promise(async (resolve, reject) => {
+function getErrorMessage(body: any, fallback: string) {
+  if (typeof body?.message === "string" && body.message.trim()) {
+    return body.message;
+  }
+  if (Array.isArray(body?.error) && body.error.length > 0) {
+    return body.error[0];
+  }
+  if (typeof body?.error === "string" && body.error.trim()) {
+    return body.error;
+  }
+  return fallback;
+}
 
-        const headers = { ...init?.headers, ...await getAuthHeaders(serverSide, rotaProtegida, contextServerSide), 'Cache-Control': 'no-cache' };
-        let customInit: RequestInit = { ...init, headers: headers, };
+export default async function fetchClient(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  rotaProtegida = true,
+  serverSide: boolean = false,
+  contextServerSide?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>,
+): Promise<any> {
+  return new Promise(async (resolve, reject) => {
+    const headers = {
+      ...init?.headers,
+      ...(await getAuthHeaders(serverSide, rotaProtegida, contextServerSide)),
+      "Cache-Control": "no-cache",
+    };
+    const customInit: RequestInit = { ...init, headers };
 
-        let res = await fetch(input, customInit)
+    const res = await fetch(input, customInit);
 
-        if (res.ok) {
-            resolve(await res.json())
-        }
-        
-        else if (res.status == 401 || res.status == 403) {
-            let body = await res.json()
-            message.error({
-                key: 401,
-                duration: 8,
-                content: body.error?.length > 0 ? body.error[0] : "Falha na Autenticação"
-            }
-            )
-            reject(body)
+    if (res.ok) {
+      resolve(await res.json());
+      return;
+    }
 
-        }else if(res.status == 400){
-            let body = await res.json()
+    let body: any = null;
+    try {
+      body = await res.json();
+    } catch {
+      body = { success: false, message: "Erro inesperado na requisição." };
+    }
 
-            message.error({
-                key: 400,
-                duration: 8,
-                content: body.error?.length > 0 ? body.error[0] : "Erro inesperado "
-            }
-            )
-            reject(body)
+    if (res.status === 401 || res.status === 403) {
+      toast.error(getErrorMessage(body, "Falha na Autenticação"), {
+        autoClose: 8000,
+      });
 
-        }
+      if (typeof window !== "undefined") {
+        const { clearClientAuth } = await import("@/app/utils/authCookie");
+        clearClientAuth();
+        window.location.href = "/?auth=expired";
+      }
 
-        else if (res.status == 500) {
+      reject(body);
+      return;
+    }
 
-            reject(res)
-        }
-        else {
-            reject(await res.json())
-        }
-    })
+    if (res.status === 400) {
+      toast.error(getErrorMessage(body, "Erro inesperado"), {
+        autoClose: 8000,
+      });
+      reject(body);
+      return;
+    }
+
+    reject({
+      ...body,
+      success: false,
+      message: getErrorMessage(body, "Erro interno do servidor"),
+      status: res.status,
+    });
+  });
 }

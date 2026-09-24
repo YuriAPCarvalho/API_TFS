@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Form, Button, message, Select, Input } from "antd";
+import { Form, Button, Select, Input } from "antd";
+import { toast } from "react-toastify";
 import Style from "./style.module.scss";
 import SelectComponent from "../Select/Select";
 import InputComponent from "../Input/Input";
@@ -17,7 +18,8 @@ import { taskTemplates } from "@/app/enums/taskTemplates";
 import { tipoTarefas } from "@/app/enums/tipoTarefas";
 import { times } from "@/app/enums/times";
 import { areaPath } from "@/app/enums/areaPath";
-import { decryptPassword } from "@/app/utils/encryption";
+import { decryptPassword, encryptPassword } from "@/app/utils/encryption";
+import { setAuthCookie } from "@/app/utils/authCookie";
 import { replaceReservedWords, getPbiCriterioAceite } from "@/app/utils/replaceReservedWords";
 import { fetchSprintReservedWords } from "@/app/utils/fetchSprintReservedWords";
 
@@ -187,13 +189,13 @@ export default function CadastrarTask() {
     if (tipoTarefaValue === "personalizado") {
       const file = values.arquivo instanceof File ? values.arquivo : null;
       if (!file) {
-        message.warning("Selecione um arquivo para tarefas personalizadas.");
+        toast.warn("Selecione um arquivo para tarefas personalizadas.");
         return;
       }
       try {
         const tasks = await processExcelFile(file, {});
         if (!tasks.length) {
-          message.warning(
+          toast.warn(
             "Nenhuma tarefa encontrada no arquivo. Verifique o cabeçalho e as linhas.",
           );
           return;
@@ -201,7 +203,7 @@ export default function CadastrarTask() {
         setTaskExcel(tasks);
         payload = { ...payload, excelTasks: tasks };
       } catch {
-        message.error(
+        toast.error(
           "Erro ao ler o arquivo. Verifique se é Excel (.xlsx) ou CSV válido.",
         );
         return;
@@ -209,7 +211,7 @@ export default function CadastrarTask() {
     }
 
     if (!dates.length) {
-      message.warning("Selecione pelo menos uma data.");
+      toast.warn("Selecione pelo menos uma data.");
       return;
     }
 
@@ -225,7 +227,7 @@ export default function CadastrarTask() {
         setIsModalOpen(true);
       }
     } catch (error) {
-      message.error("Erro ao processar formulário.");
+      toast.error("Erro ao processar formulário.");
     } finally {
       setLoading(false);
     }
@@ -305,7 +307,7 @@ export default function CadastrarTask() {
         }
 
         setPullRequests(filteredPRs);
-        message.success(
+        toast.success(
           `${filteredPRs.length} pull requests encontrados${selectedDates.length > 0 ? " para as datas selecionadas" : ""}`,
         );
 
@@ -317,10 +319,10 @@ export default function CadastrarTask() {
           await createTasksFromPullRequests(filteredPRs, usuario, senha, fv);
         }
       } else {
-        message.error("Erro ao buscar pull requests");
+        toast.error("Erro ao buscar pull requests");
       }
     } catch (error) {
-      message.error("Erro ao buscar pull requests");
+      toast.error("Erro ao buscar pull requests");
     }
   };
 
@@ -333,7 +335,7 @@ export default function CadastrarTask() {
     try {
       const fv = submittedFormValues || formValues;
       if (!fv || !usuario || !senha) {
-        message.error("Dados do formulário não encontrados");
+        toast.error("Dados do formulário não encontrados");
         return;
       }
 
@@ -432,30 +434,55 @@ export default function CadastrarTask() {
             value: prDateISO,
           },
         ]);
-        return fetchClient(`/api/Task`, {
-          method: "POST",
-          body: bodyJson,
-        });
+        try {
+          return await fetchClient(`/api/Task`, {
+            method: "POST",
+            body: bodyJson,
+          });
+        } catch (error: any) {
+          return {
+            success: false,
+            message:
+              error?.message ||
+              "Erro ao cadastrar a task.",
+          };
+        }
       });
 
       const results = await Promise.all(promises);
-      const successCount = results.filter((resp) => resp?.success).length;
+      const successes = results.filter((resp) => resp?.success);
+      const failures = results.filter((resp) => !resp?.success);
 
-      if (successCount === prs.length) {
-        message.success(`${successCount} tarefas criadas com sucesso!`);
-      } else {
-        message.warning(
-          `${successCount} de ${prs.length} tarefas criadas com sucesso.`,
-        );
+      successes.forEach((resp) => {
+        toast.success(resp?.message || "Task criada com sucesso!");
+      });
+
+      failures.forEach((resp) => {
+        toast.error(resp?.message || "Erro ao cadastrar a task.");
+      });
+
+      if (successes.length === 0 && failures.length === 0) {
+        toast.warn("Nenhuma task foi processada.");
       }
-    } catch (error) {
-      message.error("Erro ao criar tarefas a partir dos pull requests");
+    } catch (error: any) {
+      toast.error(
+        error?.message || "Erro ao criar tarefas a partir dos pull requests",
+      );
     }
   };
 
   const handleLoginSuccess = async (values: any, submittedFormValues?: any) => {
     setLoading(true);
     try {
+      const encryptedPassword = encryptPassword(values.senha);
+      const authPayload = {
+        usuario: values.usuario,
+        senha: encryptedPassword,
+      };
+      sessionStorage.setItem("tfs_user", JSON.stringify(authPayload));
+      setAuthCookie(authPayload);
+      setSavedUser({ usuario: values.usuario, senha: values.senha });
+
       const fv = submittedFormValues || formValues;
       await fetchSprints(values.usuario, values.senha);
 
@@ -471,7 +498,7 @@ export default function CadastrarTask() {
             : null;
 
         if (fv.tipoTarefa === "personalizado" && !excelTasks?.length) {
-          message.warning(
+          toast.warn(
             "Carregue um arquivo com tarefas (colunas: title, description, pbi, activityId, activity, complexity).",
           );
           return;
@@ -518,7 +545,7 @@ export default function CadastrarTask() {
             for (const t of excelTasks) {
               const pbiId = String(t.pbi ?? "").trim();
               if (!pbiId) {
-                message.warning("Linha do arquivo sem PBI — task ignorada.");
+                toast.warn("Linha do arquivo sem PBI — task ignorada.");
                 continue;
               }
 
@@ -533,7 +560,7 @@ export default function CadastrarTask() {
                 });
 
                 if (!resp?.success || !resp.data?.fields) {
-                  message.warning(
+                  toast.warn(
                     `PBI ${pbiId} não encontrada — task ignorada.`,
                   );
                   continue;
@@ -551,12 +578,12 @@ export default function CadastrarTask() {
                 pbiIterationPath += `\\${fv.sprint}`;
                 iterationPathValue = pbiIterationPath;
               } catch {
-                message.warning(`Erro ao buscar PBI ${pbiId} — task ignorada.`);
+                toast.warn(`Erro ao buscar PBI ${pbiId} — task ignorada.`);
                 continue;
               }
 
               if (!pbiAreaPath) {
-                message.warning(`PBI ${pbiId} sem Area Path — task ignorada.`);
+                toast.warn(`PBI ${pbiId} sem Area Path — task ignorada.`);
                 continue;
               }
 
@@ -668,27 +695,36 @@ export default function CadastrarTask() {
                 },
               ]);
 
-              const response = await fetchClient(`/api/Task`, {
-                method: "POST",
-                body: bodyJson,
-              });
-              results.push(response);
+              try {
+                const response = await fetchClient(`/api/Task`, {
+                  method: "POST",
+                  body: bodyJson,
+                });
+                results.push(response);
+              } catch (error: any) {
+                results.push({
+                  success: false,
+                  message: error?.message || "Erro ao cadastrar a task.",
+                });
+              }
             }
 
             if (results.length === 0) {
-              message.warning(
+              toast.warn(
                 "Nenhuma task foi criada. Verifique as PBIs no arquivo.",
               );
               continue;
             }
 
-            const success = results.every((resp) => resp?.success);
+            const successes = results.filter((resp) => resp?.success);
+            const failures = results.filter((resp) => !resp?.success);
 
-            if (success) {
-              message.success("Todas as tasks foram cadastradas com sucesso!");
-            } else {
-              message.error("Erro ao cadastrar algumas tasks.");
-            }
+            successes.forEach((resp) => {
+              toast.success(resp?.message || "Task criada com sucesso!");
+            });
+            failures.forEach((resp) => {
+              toast.error(resp?.message || "Erro ao cadastrar a task.");
+            });
           } else if (fv.tipoTarefa !== "personalizado") {
             let tasks: any[];
             if (fv.tipoTarefa === "feedback-colaborador") {
@@ -696,7 +732,7 @@ export default function CadastrarTask() {
                 ? fv.colaboradores
                 : [];
               if (colaboradores.length === 0) {
-                message.warning(
+                toast.warn(
                   "Selecione pelo menos um colaborador para Feedback por colaborador.",
                 );
                 break;
@@ -719,7 +755,7 @@ export default function CadastrarTask() {
             if (fv.tipoTarefa === "refinamento") {
               const pbisRelacionadas = (fv.pbisRelacionadas ?? "").trim();
               if (!pbisRelacionadas) {
-                message.warning(
+                toast.warn(
                   "Informe as PBIs Relacionadas para o tipo Refinamento.",
                 );
                 break;
@@ -750,7 +786,7 @@ export default function CadastrarTask() {
                   });
 
                   if (!resp?.success || !resp.data) {
-                    message.warning(
+                    toast.warn(
                       `PBI ${pbiId} não encontrada ou erro na busca.`,
                     );
                     continue;
@@ -849,19 +885,28 @@ export default function CadastrarTask() {
 
                   if (taskResp?.success) {
                     createdRefinamento++;
+                    toast.success(
+                      taskResp.message || "Task cadastrada com sucesso!",
+                    );
+                  } else {
+                    toast.error(
+                      taskResp?.message || "Erro ao cadastrar a task.",
+                    );
                   }
-                } catch {
-                  message.warning(`Erro ao processar PBI ${pbiId}.`);
+                } catch (error: any) {
+                  toast.error(
+                    error?.message || `Erro ao processar PBI ${pbiId}.`,
+                  );
                 }
               }
 
               if (createdRefinamento > 0) {
-                message.success(
+                toast.success(
                   `${createdRefinamento} tarefa(s) de refinamento criada(s).`,
                 );
               }
               if (createdRefinamento < pbiIds.length) {
-                message.warning(
+                toast.warn(
                   `${pbiIds.length - createdRefinamento} PBI(s) não geraram task (não encontrada ou erro).`,
                 );
               }
@@ -991,22 +1036,32 @@ export default function CadastrarTask() {
                 },
               ]);
 
-              const response = await fetchClient(`/api/Task`, {
-                method: "POST",
-                body: bodyJson,
-              });
+              try {
+                const response = await fetchClient(`/api/Task`, {
+                  method: "POST",
+                  body: bodyJson,
+                });
 
-              if (response.success) {
-                message.success("Task cadastrada com sucesso!");
-              } else {
-                message.error("Erro ao cadastrar a task.");
+                if (response?.success) {
+                  toast.success(
+                    response.message || "Task cadastrada com sucesso!",
+                  );
+                } else {
+                  toast.error(
+                    response?.message || "Erro ao cadastrar a task.",
+                  );
+                }
+              } catch (error: any) {
+                toast.error(
+                  error?.message || "Erro ao cadastrar a task.",
+                );
               }
             }
           }
         }
       }
-    } catch (error) {
-      message.error("Erro ao cadastrar.");
+    } catch (error: any) {
+      toast.error(error?.message || "Erro ao cadastrar.");
     } finally {
       setLoading(false);
       setIsModalOpen(false);
@@ -1028,16 +1083,16 @@ export default function CadastrarTask() {
       const tasks = await processExcelFile(file, {});
       if (tasks.length === 0) {
         setTaskExcel(null);
-        message.warning(
+        toast.warn(
           "Nenhuma tarefa encontrada no arquivo. Verifique o cabeçalho e as linhas preenchidas.",
         );
         return;
       }
       setTaskExcel(tasks);
-      message.success(`${tasks.length} tarefa(s) carregada(s) do arquivo.`);
+      toast.success(`${tasks.length} tarefa(s) carregada(s) do arquivo.`);
     } catch {
       setTaskExcel(null);
-      message.error(
+      toast.error(
         "Erro ao ler o arquivo. Use Excel (.xlsx) ou CSV com colunas: title, description, pbi, activityId, activity, complexity.",
       );
     }

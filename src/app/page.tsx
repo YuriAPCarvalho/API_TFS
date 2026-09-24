@@ -1,32 +1,41 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { FaRocket, FaSpinner } from "react-icons/fa";
 import { LogoSistema } from "./components/LogoSistema/LogoSistema";
 import ModalLoginGSI from "./components/ModalLoginGSI/ModalLoginGSI";
 import Styles from "./styles.module.scss";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { encryptPassword } from "./utils/encryption";
+import { clearClientAuth, setAuthCookie } from "./utils/authCookie";
+import { toast } from "react-toastify";
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("auth") === "expired") {
+      clearClientAuth();
+      toast.warn("Sessão expirada ou inválida. Faça login novamente.");
+      router.replace("/");
+    }
+  }, [searchParams, router]);
 
   const handleClick = () => {
     setIsModalOpen(true);
   };
 
   const handleLoginSuccess = (values: any) => {
-    // Salva o usuário na sessão com a senha criptografada
     if (typeof window !== "undefined") {
       const encryptedPassword = encryptPassword(values.senha);
-      sessionStorage.setItem(
-        "tfs_user",
-        JSON.stringify({
-          usuario: values.usuario,
-          senha: encryptedPassword,
-        }),
-      );
+      const payload = {
+        usuario: values.usuario,
+        senha: encryptedPassword,
+      };
+      sessionStorage.setItem("tfs_user", JSON.stringify(payload));
+      setAuthCookie(payload);
     }
     setIsModalOpen(false);
     setLoading(true);
@@ -82,5 +91,13 @@ export default function Home() {
         onFinish={handleLoginSuccess}
       />
     </>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }

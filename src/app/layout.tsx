@@ -5,6 +5,7 @@ import "../app/styles/_base.scss";
 import "../app/styles/globals.scss";
 import "../app/styles/antd-styles.scss";
 import Head from "next/head";
+import ToastProvider from "./components/ToastProvider/ToastProvider";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -42,6 +43,7 @@ export default function RootLayout({
         className={`${roboto.variable} antialiased`}
       >
         {children}
+        <ToastProvider />
       </body>
     </html>
   );

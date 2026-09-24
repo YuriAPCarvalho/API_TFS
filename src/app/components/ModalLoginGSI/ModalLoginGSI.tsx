@@ -1,4 +1,5 @@
-import { Button, Col, Form, Modal, Row, Input, message } from "antd";
+import { Button, Col, Form, Row } from "antd";
+import { toast } from "react-toastify";
 import React, { useEffect, useState } from "react";
 import Style from "./style.module.scss";
 import InputComponent from "../Input/Input";
@@ -17,7 +18,32 @@ export default function ModalLoginGSI(props: ModalLoginGSIProps) {
   useEffect(() => {}, [props.visible]);
 
   const onFinish = async (values: any) => {
-    props.onFinish(values);
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/GetSprints`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usuario: values.usuario,
+          senha: values.senha,
+        }),
+      });
+
+      if (response.status === 401) {
+        const body = await response.json().catch(() => null);
+        toast.error(
+          body?.message ||
+            "Falha na autenticação. Verifique suas credenciais.",
+        );
+        return;
+      }
+
+      props.onFinish(values);
+    } catch {
+      toast.error("Não foi possível validar o login. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -26,9 +52,7 @@ export default function ModalLoginGSI(props: ModalLoginGSIProps) {
         <div className={Style.modal}>
           <div className={Style.modalContent}>
             <div className={Style.warningContainer}>
-              <b className={Style.warningText}>
-                Fazer Login
-              </b>
+              <b className={Style.warningText}>Fazer Login</b>
             </div>
             <Form
               form={form}
@@ -38,8 +62,10 @@ export default function ModalLoginGSI(props: ModalLoginGSIProps) {
               labelCol={{ span: 24 }}
               autoComplete="off"
               onFinish={onFinish}
-              onFinishFailed={(errorInfo) => {
-                message.error('Por favor, preencha todos os campos obrigatórios.');
+              onFinishFailed={() => {
+                toast.error(
+                  "Por favor, preencha todos os campos obrigatórios.",
+                );
               }}
             >
               <div className={Style.CaixaTexto}>
@@ -49,7 +75,12 @@ export default function ModalLoginGSI(props: ModalLoginGSIProps) {
                       <Form.Item
                         className={Style.ItemCaixaTexto}
                         name="usuario"
-                        rules={[{ required: true, message: "Insira o Nome de Usuário" }]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Insira o Nome de Usuário",
+                          },
+                        ]}
                       >
                         <InputComponent
                           name="Nome de Usuário"
@@ -65,7 +96,9 @@ export default function ModalLoginGSI(props: ModalLoginGSIProps) {
                       <Form.Item
                         className={Style.ItemCaixaTexto}
                         name="senha"
-                        rules={[{ required: true, message: "Insira sua Senha" }]}
+                        rules={[
+                          { required: true, message: "Insira sua Senha" },
+                        ]}
                       >
                         <InputComponent
                           name="Senha"
@@ -83,6 +116,7 @@ export default function ModalLoginGSI(props: ModalLoginGSIProps) {
                 <Button
                   className={"buttonPrimaryOutline"}
                   onClick={() => props.setVisibleFalse(false)}
+                  disabled={loading}
                 >
                   Cancelar
                 </Button>
